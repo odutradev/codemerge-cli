@@ -1,0 +1,48 @@
+{
+  "name": "codemerge",
+  "version": "1.0.0",
+  "description": "AI-focused code and data preparation utility",
+  "license": "MIT",
+  "author": "CodeMerge Team",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "codemerge": "bin/codemerge.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/codemerge.git"
+  },
+  "keywords": [
+    "ai",
+    "code",
+    "merge",
+    "preparation",
+    "cli",
+    "developer-tools"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/cli.ts",
+    "start": "node dist/cli.js",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "chalk": "^5.4.1",
+    "chokidar": "^3.6.0",
+    "commander": "^11.1.0",
+    "glob": "^10.3.10"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "files": [
+    "dist/**/*",
+    "bin/**/*"
+  ]
+}

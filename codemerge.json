@@ -1,0 +1,20 @@
+{
+  "outputPath": "ai-digest.txt",
+  "watch": false,
+  "ignorePatterns": [
+    "node_modules/**",
+    ".git/**",
+    "dist/**",
+    "build/**",
+    "**/*.log",
+    ".env*"
+  ],
+  "includePatterns": [
+    "**/*.ts",
+    "**/*.js",
+    "**/*.tsx",
+    "**/*.jsx",
+    "**/*.json",
+    "**/*.md"
+  ]
+}
