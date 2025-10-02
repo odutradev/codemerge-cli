@@ -1,10 +1,10 @@
 import { resolve, relative } from 'path';
 import { glob } from 'glob';
 
-import { FileUtils } from '../utils/fileUtils.js';
-import { PathUtils } from '../utils/pathUtils.js';
+import { FileUtils } from '../utils/fileUtils';
+import { PathUtils } from '../utils/pathUtils';
 
-import type { MergeOptions, MergeResult, FileData } from '../types/index';
+import type { MergeOptions, MergeResult, FileData } from '../types/merge';
 
 export class CodeMerger {
   private options: MergeOptions;
