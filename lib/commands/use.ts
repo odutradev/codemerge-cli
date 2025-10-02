@@ -4,7 +4,7 @@ import { CodeMerger } from '../core/codeMerger.js';
 import { Config } from '../core/config.js';
 import { Logger } from '../utils/logger.js';
 
-import type { CommandOptions } from '../types';
+import type { CommandOptions } from '../types.js';
 
 export class UseCommand {
   public register(program: Command): void {

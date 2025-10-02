@@ -3,7 +3,7 @@ import { join } from 'path';
 import { FileUtils } from '../utils/fileUtils.js';
 import { PathUtils } from '../utils/pathUtils.js';
 
-import type { ConfigFile, MergeOptions } from '../types';
+import type { ConfigFile, MergeOptions } from '../types.js';
 
 export class Config {
   private static readonly CONFIG_FILENAMES = [

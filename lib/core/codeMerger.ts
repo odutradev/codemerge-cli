@@ -4,7 +4,7 @@ import { glob } from 'glob';
 import { FileUtils } from '../utils/fileUtils.js';
 import { PathUtils } from '../utils/pathUtils.js';
 
-import type { MergeOptions, MergeResult, FileData } from '../types';
+import type { MergeOptions, MergeResult, FileData } from '../types.js';
 
 export class CodeMerger {
   private options: MergeOptions;
