@@ -21,6 +21,13 @@ const bumpVersion = (version) => {
 
 const updateVersionCommitAndPush = async () => {
   try {
+    const { stdout: lastCommit } = await execAsync('git log -1 --pretty=%B');
+    
+    if (lastCommit.includes('bump version to')) {
+      console.log(chalk.yellow('⚠️  Último commit já é um bump. Pulando...'));
+      return;
+    }
+
     console.log(chalk.blue('Starting version bump...'));
 
     const pkgPath = join(process.cwd(), 'package.json');
