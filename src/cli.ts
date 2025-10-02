@@ -24,7 +24,7 @@ class CLI {
     const packagePath = join(__dirname, '../package.json');
     const packageJson = JSON.parse(readFileSync(packagePath, 'utf-8'));
     
-    this.program.name('codemerge').description('AI-focused code and data preparation utility').version(packageJson.version);
+    this.program.name('codemerge').description(packageJson.description).version(packageJson.version);
   }
 
   private registerCommands(): void {
