@@ -3,7 +3,7 @@ import figlet from 'figlet';
 import chalk from 'chalk';
 
 export class Logger {
-  private static readonly PREFIX = chalk.magenta('[codemerge]');
+  private static readonly PREFIX = chalk.redBright('[codemerge]');
 
   public static info(message: string): void {
     console.log(`${this.PREFIX} ${chalk.cyan('[info]')} ${message}`);
