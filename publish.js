@@ -1,11 +1,9 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import { readFile, writeFile, mkdir, readdir, stat, unlink } from 'fs/promises';
-import { createWriteStream } from 'fs';
+import { readFile, writeFile } from 'fs/promises';
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import archiver from 'archiver';
 import { join } from 'path';
 import chalk from 'chalk';
 
@@ -37,16 +35,18 @@ const updateVersionCommitAndPush = async () => {
     console.log(`Package version: ${chalk.cyanBright(oldVersion)} → ${chalk.greenBright(newVersion)}`);
 
     await execAsync('git add package.json');
-    if (manifestUpdated) {
-      await execAsync('git add manifest.json');
-    }
-    
     await execAsync(`git commit -m "chore: bump version to ${newVersion}"`);
     await execAsync(`git push origin ${process.env.BRANCH || 'master'}`);
 
-    console.log(chalk.green(`✅ Version bumped,, committed, and pushed to "${process.env.BRANCH || 'master'}" branch`));
+    console.log(chalk.green(`✅ Version bumped, committed, and pushed to "${process.env.BRANCH || 'master'}" branch`));
+
+    console.log(chalk.blue('Publishing to npm...'));
+    await execAsync('npm publish');
+    console.log(chalk.green('✅ Successfully published to npm'));
+
   } catch (err) {
-    console.error(chalk.red('Error updating version:'), err);
+    console.error(chalk.red('Error during publish process:'), err);
+    process.exit(1);
   }
 };
 
