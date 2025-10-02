@@ -20,7 +20,7 @@ export class InitCommand {
       const resolvedPath = PathUtils.resolve(targetPath);
       const generator = new FileGenerator(resolvedPath);
       const result = generator.generate(options.force || false);
-      
+     console.log(resolvedPath, result) 
       if (result.success) {
         Logger.success('Created ' + result.filesCreated + ' files successfully');
         Logger.plain('');
