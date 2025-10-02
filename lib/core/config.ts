@@ -1,10 +1,10 @@
 import { join } from 'path';
 
-import { FileUtils } from '../utils/fileUtils';
-import { PathUtils } from '../utils/pathUtils';
+import { FileUtils } from '../utils/fileUtils.js';
+import { PathUtils } from '../utils/pathUtils.js';
 
-import type { MergeOptions } from '../types/merge';
-import type { ConfigFile } from '../types/config';
+import type { MergeOptions } from '../types/merge.js';
+import type { ConfigFile } from '../types/config.js';
 
 export class Config {
   private static readonly CONFIG_FILENAMES = [

@@ -1,9 +1,9 @@
 import { resolve, relative } from 'path';
 import { glob } from 'glob';
 
-import { FileUtils } from '../utils/fileUtils';
+import { FileUtils } from '../utils/fileUtils.js'; 
 
-import type { MergeOptions, MergeResult, FileData } from '../types/merge';
+import type { MergeOptions, MergeResult, FileData } from '../types/merge.js';
 
 export class CodeMerger {
   private options: MergeOptions;
