@@ -24,7 +24,8 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsx watch src/cli.ts",
-    "start": "node dist/cli.js",
+    "codemerge": "node dist/cli.js",
+    "publish": "node publish.js",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
