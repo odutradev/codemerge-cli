@@ -1,7 +1,7 @@
 import { join } from 'path';
 
-import { FileUtils } from '../utils/fileUtils.js';
-import { PathUtils } from '../utils/pathUtils.js';
+import { FileUtils } from '../utils/fileUtils';
+import { PathUtils } from '../utils/pathUtils';
 
 import type { MergeOptions } from '../types/merge';
 import type { ConfigFile } from '../types/config';

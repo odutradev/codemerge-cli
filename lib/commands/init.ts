@@ -1,8 +1,8 @@
 import { Command } from 'commander';
 
-import { FileGenerator } from '../core/fileGenerator.js';
-import { Logger } from '../utils/logger.js';
-import { PathUtils } from '../utils/pathUtils.js';
+import { FileGenerator } from '../core/fileGenerator';
+import { PathUtils } from '../utils/pathUtils';
+import { Logger } from '../utils/logger';
 
 interface InitOptions {
   force?: boolean;

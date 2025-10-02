@@ -1,8 +1,8 @@
 import { mkdirSync } from 'fs';
 import { join, dirname } from 'path';
 
-import { FileUtils } from '../utils/fileUtils.js';
-import { FILE_TEMPLATES } from './fileTemplates.js';
+import { FileUtils } from '../utils/fileUtils';
+import { FILE_TEMPLATES } from './fileTemplates';
 
 export interface GenerateResult {
   success: boolean;

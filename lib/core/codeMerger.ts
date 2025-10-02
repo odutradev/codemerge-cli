@@ -2,7 +2,6 @@ import { resolve, relative } from 'path';
 import { glob } from 'glob';
 
 import { FileUtils } from '../utils/fileUtils';
-import { PathUtils } from '../utils/pathUtils';
 
 import type { MergeOptions, MergeResult, FileData } from '../types/merge';
 
