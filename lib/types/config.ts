@@ -1,6 +1,7 @@
 export interface ConfigFile {
   outputPath?: string;
   watch?: boolean;
+  watchDelay?: number;
   ignorePatterns?: string[];
   includePatterns?: string[];
   projectName?: string;
