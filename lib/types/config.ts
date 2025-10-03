@@ -3,6 +3,7 @@ export interface ConfigFile {
   watch?: boolean;
   ignorePatterns?: string[];
   includePatterns?: string[];
+  projectName?: string;
 }
 
 export interface CommandOptions {
@@ -10,4 +11,5 @@ export interface CommandOptions {
   watch?: boolean;
   ignore?: string;
   include?: string;
+  port?: string;
 }
