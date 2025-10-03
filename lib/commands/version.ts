@@ -1,13 +1,12 @@
 import { Command } from 'commander';
+
 import { FileUtils } from '../utils/fileUtils.js';
+import { PathUtils } from '../utils/pathUtils.js';
 import { Logger } from '../utils/logger.js';
 
 export class VersionCommand {
   public register(program: Command): void {
-    program
-      .command('version')
-      .description('Display version information')
-      .action(() => this.execute());
+    program.command('version').description('Display version information').action(() => this.execute());
   }
 
   private async execute(): Promise<void> {
@@ -21,13 +20,18 @@ export class VersionCommand {
   }
 
   private displayBanner(): void {
-    const packageJson = FileUtils.readJson('./package.json') as any;
+    const packageJson = this.getPackageJson();
     const name = packageJson.name.replace('-', ' ').toUpperCase();
     Logger.figlet(name);
   }
 
   private displayVersion(): void {
-    const packageJson = FileUtils.readJson('./package.json') as any;
+    const packageJson = this.getPackageJson();
     Logger.info(`Version: ${packageJson.version}`);
+  }
+
+  private getPackageJson(): any {
+    const packagePath = PathUtils.getPackagePath(import.meta.url, 'package.json');
+    return FileUtils.readJson(packagePath);
   }
 }
