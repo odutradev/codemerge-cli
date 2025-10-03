@@ -5,6 +5,7 @@ export interface ConfigFile {
   ignorePatterns?: string[];
   includePatterns?: string[];
   projectName?: string;
+  useGitignore?: boolean;
 }
 
 export interface CommandOptions {

@@ -5,6 +5,7 @@ export interface MergeOptions {
   watchDelay: number;
   ignorePatterns: string[];
   includePatterns: string[];
+  useGitignore: boolean;
 }
 
 export interface FileData {
