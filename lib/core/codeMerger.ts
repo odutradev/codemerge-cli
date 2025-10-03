@@ -67,7 +67,10 @@ export class CodeMerger {
   private mergeFiles(files: FileData[]): string {
     const totalLines = files.reduce((sum, file) => sum + file.content.split('\n').length, 0);
     const totalChars = files.reduce((sum, file) => sum + file.content.length, 0);
-    const header = this.generateHeader(files.length, totalLines, totalChars);
+    const breakdown = this.generateBreakdown(files);
+    const projectTree = this.generateProjectTree(files);
+    const fileIndex = this.generateFileIndex(files);
+    const header = this.generateHeader(files.length, totalLines, totalChars, breakdown, projectTree, fileIndex);
     const separator = '='.repeat(80);
     
     const mergedContent = files.map(file => {
@@ -85,7 +88,7 @@ export class CodeMerger {
     return [header, separator, '', mergedContent].join('\n');
   }
 
-  private generateHeader(fileCount: number, totalLines: number, totalChars: number): string {
+  private generateHeader(fileCount: number, totalLines: number, totalChars: number, breakdown: string, projectTree: string, fileIndex: string): string {
     const timestamp = new Date().toISOString();
     return [
       '# Code Merge Output',
@@ -93,8 +96,71 @@ export class CodeMerger {
       'Source path: ' + this.options.inputPath,
       'Files processed: ' + fileCount,
       'Total lines: ' + totalLines,
-      'Total characters: ' + totalChars
+      'Total characters: ' + totalChars,
+      '',
+      breakdown,
+      '',
+      projectTree,
+      '',
+      fileIndex
     ].join('\n');
+  }
+
+  private generateBreakdown(files: FileData[]): string {
+    const typeMap = new Map<string, { count: number; lines: number }>();
+    
+    files.forEach(file => {
+      const ext = file.relativePath.split('.').pop() || 'unknown';
+      const lines = file.content.split('\n').length;
+      const current = typeMap.get(ext) || { count: 0, lines: 0 };
+      typeMap.set(ext, { count: current.count + 1, lines: current.lines + lines });
+    });
+
+    const sorted = Array.from(typeMap.entries()).sort((a, b) => b[1].count - a[1].count);
+    const lines = sorted.map(([ext, data]) => `  - ${ext}: ${data.count} files (${data.lines.toLocaleString()} lines)`);
+    
+    return ['File types:', ...lines].join('\n');
+  }
+
+  private generateProjectTree(files: FileData[]): string {
+    const tree = new Map<string, Set<string>>();
+    
+    files.forEach(file => {
+      const parts = file.relativePath.split(/[/\\]/);
+      if (parts.length === 1) {
+        if (!tree.has('.')) tree.set('.', new Set());
+        tree.get('.')!.add(parts[0]);
+        return;
+      }
+      
+      for (let i = 0; i < parts.length - 1; i++) {
+        const dir = parts.slice(0, i + 1).join('/');
+        if (!tree.has(dir)) tree.set(dir, new Set());
+        if (i === parts.length - 2) tree.get(dir)!.add(parts[parts.length - 1]);
+      }
+    });
+
+    const sortedDirs = Array.from(tree.keys()).sort();
+    const lines = ['Project structure:'];
+    
+    sortedDirs.forEach(dir => {
+      const files = Array.from(tree.get(dir)!).sort();
+      const fileCount = files.length;
+      const indent = dir === '.' ? '' : '  '.repeat(dir.split('/').length);
+      const displayDir = dir === '.' ? '.' : dir.split('/').pop();
+      lines.push(`${indent}${displayDir}/ (${fileCount} files)`);
+    });
+
+    return lines.join('\n');
+  }
+
+  private generateFileIndex(files: FileData[]): string {
+    const lines = files.map((file, index) => {
+      const lineCount = file.content.split('\n').length;
+      return `  ${(index + 1).toString().padStart(2, ' ')}. ${file.relativePath} (${lineCount.toLocaleString()} lines)`;
+    });
+    
+    return ['File index:', ...lines].join('\n');
   }
 
   private writeOutput(content: string): void {
