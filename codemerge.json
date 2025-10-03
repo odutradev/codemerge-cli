@@ -5,9 +5,10 @@
   "watchDelay": 1500,
   "useGitignore": true,
   "ignorePatterns": [
-    "node_modules/**",
     ".git/**",
     "dist/**",
+    "node_modules/**",
+    "package-lock.json",
     "build/**",
     "**/*.log",
     ".env*",

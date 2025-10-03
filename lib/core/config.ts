@@ -18,6 +18,7 @@ export class Config {
     'dist/**',
     'build/**',
     '**/*.log',
+    'package-lock.json',
     '.env*',
     '**/.DS_Store',
     'coverage/**',
