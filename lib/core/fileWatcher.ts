@@ -1,3 +1,4 @@
+import { resolve } from 'path';
 import chokidar from 'chokidar';
 
 import { Logger } from '../utils/logger.js';
@@ -9,6 +10,7 @@ export class FileWatcher {
   private options: MergeOptions;
   private onChange: () => Promise<void>;
   private debounceTimer: NodeJS.Timeout | null = null;
+  private changedFiles: Set<string> = new Set();
 
   constructor(options: MergeOptions, onChange: () => Promise<void>) {
     this.options = options;
@@ -18,8 +20,10 @@ export class FileWatcher {
   public start(): void {
     if (this.watcher) this.stop();
 
+    const outputPath = resolve(this.options.outputPath);
+
     this.watcher = chokidar.watch(this.options.inputPath, {
-      ignored: this.options.ignorePatterns,
+      ignored: [...this.options.ignorePatterns, outputPath],
       persistent: true,
       ignoreInitial: true
     });
@@ -40,19 +44,31 @@ export class FileWatcher {
       clearTimeout(this.debounceTimer);
       this.debounceTimer = null;
     }
+    this.changedFiles.clear();
   }
 
   private handleFileChange(path: string): void {
-    Logger.info(`File changed: ${path}`);
+    const outputPath = resolve(this.options.outputPath);
+    const fullPath = resolve(path);
+    
+    if (fullPath === outputPath) return;
+
+    this.changedFiles.add(path);
     
     if (this.debounceTimer) clearTimeout(this.debounceTimer);
     
     this.debounceTimer = setTimeout(async () => {
+      const files = Array.from(this.changedFiles);
+      this.changedFiles.clear();
+
+      Logger.info(`Files changed (${files.length}):`);
+      files.forEach(file => Logger.plain(`  ${file}`));
+      
       try {
         await this.onChange();
       } catch (error) {
         Logger.error('Error during file change handling: ' + (error instanceof Error ? error.message : 'Unknown error'));
       }
-    }, 300);
+    }, this.options.watchDelay);
   }
 }
