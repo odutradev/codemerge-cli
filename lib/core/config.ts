@@ -34,6 +34,8 @@ export class Config {
     '**/*.md'
   ];
 
+  private static readonly DEFAULT_WATCH_DELAY = 1500;
+
   public static load(basePath: string): ConfigFile {
     const resolvedPath = PathUtils.resolve(basePath);
     
@@ -72,6 +74,7 @@ export class Config {
       inputPath: options.inputPath || process.cwd(),
       outputPath: options.outputPath || config.outputPath || 'merged-output.txt',
       watch: options.watch ?? config.watch ?? false,
+      watchDelay: options.watchDelay ?? config.watchDelay ?? this.DEFAULT_WATCH_DELAY,
       ignorePatterns: options.ignorePatterns || config.ignorePatterns || this.DEFAULT_IGNORE_PATTERNS,
       includePatterns: options.includePatterns || config.includePatterns || this.DEFAULT_INCLUDE_PATTERNS
     };
