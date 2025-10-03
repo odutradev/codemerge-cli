@@ -27,11 +27,14 @@ export class InitCommand {
         process.exit(1);
       }
       
-      this.createConfigFile(configPath);
-      this.updateGitignore(resolvedPath);
+      const projectName = this.getProjectName(resolvedPath);
+      const outputPath = projectName ? `${projectName}-merged.txt` : 'merged-output.txt';
+      
+      this.createConfigFile(configPath, outputPath);
+      this.updateGitignore(resolvedPath, outputPath);
       
       Logger.success('Configuration file created: codemerge.json');
-      Logger.plain('Output file added to .gitignore');
+      Logger.plain('Output file added to .gitignore: ' + outputPath);
       Logger.plain('');
       Logger.plain('Next steps:');
       Logger.plain('  1. Review codemerge.json settings');
@@ -42,9 +45,23 @@ export class InitCommand {
     }
   }
 
-  private createConfigFile(configPath: string): void {
+  private getProjectName(basePath: string): string | null {
+    const packagePath = join(basePath, 'package.json');
+    if (!FileUtils.exists(packagePath)) return null;
+
+    try {
+      const pkg = FileUtils.readJson<{ name?: string }>(packagePath);
+      if (!pkg.name) return null;
+      
+      return pkg.name.replace(/^@.*?\//, '').replace(/[^a-zA-Z0-9-_]/g, '-').toLowerCase();
+    } catch {
+      return null;
+    }
+  }
+
+  private createConfigFile(configPath: string, outputPath: string): void {
     const config = {
-      outputPath: 'merged-output.txt',
+      outputPath,
       watch: false,
       ignorePatterns: [
         'node_modules/**',
@@ -71,9 +88,8 @@ export class InitCommand {
     FileUtils.write(configPath, JSON.stringify(config, null, 2) + '\n');
   }
 
-  private updateGitignore(basePath: string): void {
+  private updateGitignore(basePath: string, outputFileName: string): void {
     const gitignorePath = join(basePath, '.gitignore');
-    const outputFileName = 'merged-output.txt';
     
     if (!FileUtils.exists(gitignorePath)) {
       FileUtils.write(gitignorePath, outputFileName + '\n');
