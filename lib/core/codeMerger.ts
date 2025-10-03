@@ -1,7 +1,7 @@
-import { resolve, relative } from 'path';
+import { resolve, relative, join } from 'path';
 import { glob } from 'glob';
 
-import { FileUtils } from '../utils/fileUtils.js'; 
+import { FileUtils } from '../utils/fileUtils.js';
 
 import type { MergeOptions, MergeResult, FileData } from '../types/merge.js';
 
@@ -37,11 +37,12 @@ export class CodeMerger {
   private async collectFiles(): Promise<FileData[]> {
     const files: FileData[] = [];
     const inputPath = resolve(this.options.inputPath);
+    const ignorePatterns = this.getIgnorePatterns(inputPath);
 
     for (const pattern of this.options.includePatterns) {
       const matchedFiles = await glob(pattern, {
         cwd: inputPath,
-        ignore: this.options.ignorePatterns,
+        ignore: ignorePatterns,
         nodir: true
       });
 
@@ -62,6 +63,37 @@ export class CodeMerger {
     }
 
     return files.sort((a, b) => a.relativePath.localeCompare(b.relativePath));
+  }
+
+  private getIgnorePatterns(inputPath: string): string[] {
+    const patterns = [...this.options.ignorePatterns];
+    
+    if (!this.options.useGitignore) return patterns;
+
+    const gitignorePath = join(inputPath, '.gitignore');
+    if (!FileUtils.exists(gitignorePath)) return patterns;
+
+    try {
+      const content = FileUtils.read(gitignorePath);
+      const gitignorePatterns = this.parseGitignore(content);
+      patterns.push(...gitignorePatterns);
+    } catch (error) {
+      return patterns;
+    }
+
+    return patterns;
+  }
+
+  private parseGitignore(content: string): string[] {
+    return content
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line && !line.startsWith('#'))
+      .map(line => {
+        if (line.endsWith('/')) return line + '**';
+        if (!line.includes('/') && !line.includes('*')) return '**/' + line;
+        return line;
+      });
   }
 
   private mergeFiles(files: FileData[]): string {
