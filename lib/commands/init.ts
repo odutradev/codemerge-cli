@@ -64,6 +64,7 @@ export class InitCommand {
       projectName,
       outputPath,
       watch: false,
+      watchDelay: 1500,
       ignorePatterns: [
         'node_modules/**',
         '.git/**',

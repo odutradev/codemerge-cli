@@ -2,6 +2,7 @@ import { Command } from 'commander';
 
 import { CodeMerger } from '../core/codeMerger.js';
 import { Config } from '../core/config.js';
+import { FileWatcher } from '../core/fileWatcher.js';
 import { Logger } from '../utils/logger.js';
 
 import type { CommandOptions } from '../types/config.js';
@@ -27,12 +28,30 @@ export class UseCommand {
       const merger = new CodeMerger(mergeOptions);
       const result = await merger.execute();
       
-      if (result.success) {
-        Logger.success('Merged ' + result.filesProcessed + ' files into ' + result.outputPath);
-      } else {
+      if (!result.success) {
         Logger.error('Merge failed:');
         result.errors.forEach(error => Logger.error('  ' + error));
         process.exit(1);
+      }
+
+      Logger.success('Merged ' + result.filesProcessed + ' files into ' + result.outputPath);
+
+      if (mergeOptions.watch) {
+        const watcher = new FileWatcher(mergeOptions, async () => {
+          const result = await merger.execute();
+          if (result.success) {
+            Logger.success('Merged ' + result.filesProcessed + ' files into ' + result.outputPath);
+          }
+        });
+        watcher.start();
+
+        process.on('SIGINT', () => {
+          Logger.plain('\nStopping watcher...');
+          watcher.stop();
+          process.exit(0);
+        });
+
+        Logger.plain('Press Ctrl+C to stop watching');
       }
     } catch (error) {
       Logger.error(error instanceof Error ? error.message : 'Unexpected error occurred');
