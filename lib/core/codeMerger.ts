@@ -65,7 +65,9 @@ export class CodeMerger {
   }
 
   private mergeFiles(files: FileData[]): string {
-    const header = this.generateHeader(files.length);
+    const totalLines = files.reduce((sum, file) => sum + file.content.split('\n').length, 0);
+    const totalChars = files.reduce((sum, file) => sum + file.content.length, 0);
+    const header = this.generateHeader(files.length, totalLines, totalChars);
     const separator = '='.repeat(80);
     
     const mergedContent = files.map(file => {
@@ -83,13 +85,15 @@ export class CodeMerger {
     return [header, separator, '', mergedContent].join('\n');
   }
 
-  private generateHeader(fileCount: number): string {
+  private generateHeader(fileCount: number, totalLines: number, totalChars: number): string {
     const timestamp = new Date().toISOString();
     return [
       '# Code Merge Output',
       'Generated at: ' + timestamp,
       'Source path: ' + this.options.inputPath,
-      'Files processed: ' + fileCount
+      'Files processed: ' + fileCount,
+      'Total lines: ' + totalLines,
+      'Total characters: ' + totalChars
     ].join('\n');
   }
 
