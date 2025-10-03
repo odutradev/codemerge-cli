@@ -2,6 +2,7 @@ export interface MergeOptions {
   inputPath: string;
   outputPath: string;
   watch: boolean;
+  watchDelay: number;
   ignorePatterns: string[];
   includePatterns: string[];
 }
