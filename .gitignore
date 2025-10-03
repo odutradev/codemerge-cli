@@ -6,3 +6,4 @@ dist/
 coverage/
 *.tsbuildinfo
 merged-output.txt
+codemerge-cli-merged.txt

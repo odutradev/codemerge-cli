@@ -1,0 +1,27 @@
+{
+  "projectName": "codemerge-cli",
+  "outputPath": "codemerge-cli-merged.txt",
+  "watch": false,
+  "watchDelay": 1500,
+  "ignorePatterns": [
+    "node_modules/**",
+    ".git/**",
+    "dist/**",
+    "build/**",
+    "**/*.log",
+    "package-lock.json",
+    ".env*",
+    "**/.DS_Store",
+    "coverage/**",
+    ".next/**",
+    ".nuxt/**"
+  ],
+  "includePatterns": [
+    "**/*.ts",
+    "**/*.js",
+    "**/*.tsx",
+    "**/*.jsx",
+    "**/*.json",
+    "**/*.md"
+  ]
+}
