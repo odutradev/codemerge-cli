@@ -30,7 +30,7 @@ export class InitCommand {
       const projectName = this.getProjectName(resolvedPath);
       const outputPath = projectName ? `${projectName}-merged.txt` : 'merged-output.txt';
       
-      this.createConfigFile(configPath, outputPath);
+      this.createConfigFile(configPath, outputPath, projectName);
       this.updateGitignore(resolvedPath, outputPath);
       
       Logger.success('Configuration file created: codemerge.json');
@@ -59,8 +59,9 @@ export class InitCommand {
     }
   }
 
-  private createConfigFile(configPath: string, outputPath: string): void {
+  private createConfigFile(configPath: string, outputPath: string, projectName: string | null): void {
     const config = {
+      projectName,
       outputPath,
       watch: false,
       ignorePatterns: [
