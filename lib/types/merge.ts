@@ -21,3 +21,25 @@ export interface MergeResult {
   filesProcessed: number;
   errors: string[];
 }
+
+export interface UpsertFile {
+  path: string;
+  content: string;
+}
+
+export interface UpsertRequest {
+  files: UpsertFile[];
+  basePath?: string;
+}
+
+export interface UpsertResult {
+  success: boolean;
+  filesProcessed: number;
+  errors: string[];
+  results: Array<{
+    path: string;
+    action: 'created' | 'updated';
+    success: boolean;
+    error?: string;
+  }>;
+}
