@@ -63,8 +63,7 @@ export class InitCommand {
     const config = {
       projectName,
       outputPath,
-      watch: false,
-      watchDelay: 1500,
+      port: 9876,
       useGitignore: true,
       ignorePatterns: [
         'node_modules/**',
@@ -72,6 +71,9 @@ export class InitCommand {
         'dist/**',
         'build/**',
         '**/*.log',
+        'package-lock.json',
+        'codemerge.json',
+        'merged-output.txt',
         '.env*',
         '**/.DS_Store',
         'coverage/**',
