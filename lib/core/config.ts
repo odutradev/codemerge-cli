@@ -19,6 +19,8 @@ export class Config {
     'build/**',
     '**/*.log',
     'package-lock.json',
+    'codemerge.json',
+    'merged-output.txt',
     '.env*',
     '**/.DS_Store',
     'coverage/**',
@@ -35,7 +37,7 @@ export class Config {
     '**/*.md'
   ];
 
-  private static readonly DEFAULT_WATCH_DELAY = 1500;
+  private static readonly DEFAULT_PORT = 9876;
 
   public static load(basePath: string): ConfigFile {
     const resolvedPath = PathUtils.resolve(basePath);
@@ -71,14 +73,22 @@ export class Config {
   }
 
   public static merge(config: ConfigFile, options: Partial<MergeOptions>): MergeOptions {
+    const outputPath = options.outputPath || config.outputPath || 'merged-output.txt';
+    const ignorePatterns = options.ignorePatterns || config.ignorePatterns || this.DEFAULT_IGNORE_PATTERNS;
+    
+    if (!ignorePatterns.includes(outputPath)) {
+      ignorePatterns.push(outputPath);
+    }
+
     return {
       inputPath: options.inputPath || process.cwd(),
-      outputPath: options.outputPath || config.outputPath || 'merged-output.txt',
-      watch: options.watch ?? config.watch ?? false,
-      watchDelay: options.watchDelay ?? config.watchDelay ?? this.DEFAULT_WATCH_DELAY,
-      ignorePatterns: options.ignorePatterns || config.ignorePatterns || this.DEFAULT_IGNORE_PATTERNS,
+      outputPath,
+      watch: options.watch ?? false,
+      watchDelay: 1500,
+      ignorePatterns,
       includePatterns: options.includePatterns || config.includePatterns || this.DEFAULT_INCLUDE_PATTERNS,
-      useGitignore: options.useGitignore ?? config.useGitignore ?? true
+      useGitignore: options.useGitignore ?? config.useGitignore ?? true,
+      port: options.port ?? config.port ?? this.DEFAULT_PORT
     };
   }
 }
