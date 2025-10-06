@@ -1,4 +1,5 @@
-import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
+import { dirname } from 'path';
 
 export class FileUtils {
   private static readonly BINARY_EXTENSIONS = [
@@ -29,5 +30,19 @@ export class FileUtils {
   public static readJson<T>(path: string): T {
     const content = this.read(path);
     return JSON.parse(content) as T;
+  }
+
+  public static upsert(path: string, content: string): 'created' | 'updated' {
+    const exists = this.exists(path);
+    const dir = dirname(path);
+    
+    if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+    
+    this.write(path, content);
+    return exists ? 'updated' : 'created';
+  }
+
+  public static ensureDir(path: string): void {
+    if (!existsSync(path)) mkdirSync(path, { recursive: true });
   }
 }
