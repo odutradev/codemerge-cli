@@ -6,6 +6,7 @@ export interface MergeOptions {
   ignorePatterns: string[];
   includePatterns: string[];
   useGitignore: boolean;
+  port: number;
 }
 
 export interface FileData {
