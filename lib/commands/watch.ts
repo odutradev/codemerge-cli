@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { basename } from 'path';
+import { basename, resolve } from 'path';
 
 import { HttpServer } from '../core/httpServer.js';
 import { CodeMerger } from '../core/codeMerger.js';
@@ -31,10 +31,11 @@ export class WatchCommand {
       const projectName = this.getProjectName(mergeOptions.outputPath);
       const port = parseInt(options.port || '9876', 10);
       const cache = new MergeCache();
+      const basePath = resolve(mergeOptions.inputPath);
       
       await this.performInitialMerge(mergeOptions, cache);
       
-      const server = new HttpServer(port, projectName, cache);
+      const server = new HttpServer(port, projectName, cache, basePath);
       await server.start();
       
       const watcher = new FileWatcher(mergeOptions, async () => {
@@ -44,7 +45,10 @@ export class WatchCommand {
       
       this.setupGracefulShutdown(server, watcher);
       
-      Logger.success(`Server running at http://localhost:${port}/${projectName}`);
+      Logger.success(`Server running at http://localhost:${port}`);
+      Logger.plain(`  Merge endpoint: http://localhost:${port}/${projectName}`);
+      Logger.plain(`  Upsert endpoint: http://localhost:${port}/upsert`);
+      Logger.plain(`  Health endpoint: http://localhost:${port}/health`);
       Logger.plain('Press Ctrl+C to stop');
     } catch (error) {
       Logger.error(error instanceof Error ? error.message : 'Unexpected error occurred');
