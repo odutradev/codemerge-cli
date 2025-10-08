@@ -2,6 +2,7 @@ import { resolve } from 'path';
 import chokidar from 'chokidar';
 
 import { Logger } from '../utils/logger.js';
+import { PatternUtils } from '../utils/patternUtils.js';
 
 import type { MergeOptions } from '../types/merge.js';
 
@@ -21,11 +22,17 @@ export class FileWatcher {
     if (this.watcher) this.stop();
 
     const outputPath = resolve(this.options.outputPath);
+    const ignorePatterns = PatternUtils.addDefaultPatterns(
+      this.options.ignorePatterns,
+      this.options.outputPath
+    );
 
     this.watcher = chokidar.watch(this.options.inputPath, {
-      ignored: [...this.options.ignorePatterns, outputPath],
+      ignored: ignorePatterns,
       persistent: true,
-      ignoreInitial: true
+      ignoreInitial: true,
+      followSymlinks: false,
+      ignorePermissionErrors: true
     });
 
     this.watcher.on('change', this.handleFileChange.bind(this));

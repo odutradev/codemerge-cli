@@ -13,19 +13,47 @@ export class Config {
   ];
 
   private static readonly DEFAULT_IGNORE_PATTERNS = [
+    'node_modules',
     'node_modules/**',
+    '**/node_modules',
+    '**/node_modules/**',
+    '.git',
     '.git/**',
+    '**/.git',
+    '**/.git/**',
+    'dist',
     'dist/**',
+    '**/dist',
+    '**/dist/**',
+    'build',
     'build/**',
-    '**/*.log',
-    'package-lock.json',
-    'codemerge.json',
-    'merged-output.txt',
-    '.env*',
-    '**/.DS_Store',
+    '**/build',
+    '**/build/**',
+    'coverage',
     'coverage/**',
+    '**/coverage',
+    '**/coverage/**',
+    '.next',
     '.next/**',
-    '.nuxt/**'
+    '**/.next',
+    '**/.next/**',
+    '.nuxt',
+    '.nuxt/**',
+    '**/.nuxt',
+    '**/.nuxt/**',
+    '**/*.log',
+    '**/package-lock.json',
+    '**/yarn.lock',
+    '**/pnpm-lock.yaml',
+    '**/.env',
+    '**/.env.*',
+    '**/.DS_Store',
+    '**/Thumbs.db',
+    '**/.vscode',
+    '**/.idea',
+    '**/codemerge.json',
+    '**/codemerge.config.json',
+    '**/merged-output.txt'
   ];
 
   private static readonly DEFAULT_INCLUDE_PATTERNS = [
@@ -74,11 +102,7 @@ export class Config {
 
   public static merge(config: ConfigFile, options: Partial<MergeOptions>): MergeOptions {
     const outputPath = options.outputPath || config.outputPath || 'merged-output.txt';
-    const ignorePatterns = options.ignorePatterns || config.ignorePatterns || this.DEFAULT_IGNORE_PATTERNS;
-    
-    if (!ignorePatterns.includes(outputPath)) {
-      ignorePatterns.push(outputPath);
-    }
+    const ignorePatterns = this.mergeIgnorePatterns(config.ignorePatterns, options.ignorePatterns, outputPath);
 
     return {
       inputPath: options.inputPath || process.cwd(),
@@ -90,5 +114,19 @@ export class Config {
       useGitignore: options.useGitignore ?? config.useGitignore ?? true,
       port: options.port ?? config.port ?? this.DEFAULT_PORT
     };
+  }
+
+  private static mergeIgnorePatterns(configPatterns?: string[], optionPatterns?: string[], outputPath?: string): string[] {
+    const patterns = new Set([...this.DEFAULT_IGNORE_PATTERNS]);
+    
+    if (configPatterns) configPatterns.forEach(p => patterns.add(p));
+    if (optionPatterns) optionPatterns.forEach(p => patterns.add(p));
+    
+    if (outputPath) {
+      patterns.add(outputPath);
+      patterns.add(`**/${outputPath}`);
+    }
+
+    return Array.from(patterns);
   }
 }

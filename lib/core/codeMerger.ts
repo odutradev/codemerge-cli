@@ -1,4 +1,4 @@
-import { resolve, relative, join } from 'path';
+import { resolve, relative, join, basename } from 'path';
 import { glob } from 'glob';
 
 import { FileUtils } from '../utils/fileUtils.js';
@@ -43,12 +43,13 @@ export class CodeMerger {
       const matchedFiles = await glob(pattern, {
         cwd: inputPath,
         ignore: ignorePatterns,
-        nodir: true
+        nodir: true,
+        dot: false
       });
 
       for (const file of matchedFiles) {
         const fullPath = resolve(inputPath, file);
-        if (FileUtils.exists(fullPath) && FileUtils.isTextFile(fullPath)) {
+        if (this.shouldProcessFile(fullPath, inputPath) && FileUtils.isTextFile(fullPath)) {
           try {
             files.push({
               path: fullPath,
@@ -65,35 +66,101 @@ export class CodeMerger {
     return files.sort((a, b) => a.relativePath.localeCompare(b.relativePath));
   }
 
+  private shouldProcessFile(fullPath: string, inputPath: string): boolean {
+    if (!FileUtils.exists(fullPath)) return false;
+    
+    const relativePath = relative(inputPath, fullPath);
+    const outputFileName = basename(this.options.outputPath);
+    const configFiles = ['codemerge.json', 'codemerge.config.json'];
+    
+    if (relativePath === outputFileName || configFiles.includes(relativePath)) return false;
+    
+    return true;
+  }
+
   private getIgnorePatterns(inputPath: string): string[] {
     const patterns = [...this.options.ignorePatterns];
     
-    if (!this.options.useGitignore) return patterns;
+    const outputFileName = basename(this.options.outputPath);
+    if (!patterns.includes(outputFileName) && !patterns.includes(`**/${outputFileName}`)) {
+      patterns.push(outputFileName);
+      patterns.push(`**/${outputFileName}`);
+    }
+
+    patterns.push('codemerge.json');
+    patterns.push('codemerge.config.json');
+    patterns.push('**/.git/**');
+    patterns.push('**/node_modules/**');
+    
+    if (!this.options.useGitignore) return this.normalizePatterns(patterns);
 
     const gitignorePath = join(inputPath, '.gitignore');
-    if (!FileUtils.exists(gitignorePath)) return patterns;
+    if (!FileUtils.exists(gitignorePath)) return this.normalizePatterns(patterns);
 
     try {
       const content = FileUtils.read(gitignorePath);
       const gitignorePatterns = this.parseGitignore(content);
       patterns.push(...gitignorePatterns);
     } catch (error) {
-      return patterns;
+      return this.normalizePatterns(patterns);
     }
+
+    return this.normalizePatterns(patterns);
+  }
+
+  private parseGitignore(content: string): string[] {
+    const patterns: string[] = [];
+    
+    content.split('\n').forEach(line => {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) return;
+      if (trimmed.startsWith('!')) return;
+      
+      let pattern = trimmed;
+      
+      if (pattern.startsWith('/')) {
+        pattern = pattern.slice(1);
+      }
+      
+      if (pattern.endsWith('/')) {
+        patterns.push(`${pattern}**`);
+        patterns.push(`**/${pattern}**`);
+      } else if (pattern.includes('/')) {
+        patterns.push(pattern);
+        if (!pattern.startsWith('**/')) patterns.push(`**/${pattern}`);
+      } else if (pattern.includes('*')) {
+        patterns.push(pattern);
+        patterns.push(`**/${pattern}`);
+      } else {
+        patterns.push(`**/${pattern}`);
+        patterns.push(`**/${pattern}/**`);
+      }
+    });
 
     return patterns;
   }
 
-  private parseGitignore(content: string): string[] {
-    return content
-      .split('\n')
-      .map(line => line.trim())
-      .filter(line => line && !line.startsWith('#'))
-      .map(line => {
-        if (line.endsWith('/')) return line + '**';
-        if (!line.includes('/') && !line.includes('*')) return '**/' + line;
-        return line;
-      });
+  private normalizePatterns(patterns: string[]): string[] {
+    const normalized = new Set<string>();
+    
+    patterns.forEach(pattern => {
+      let p = pattern.trim();
+      if (!p) return;
+      
+      if (p.startsWith('./')) p = p.slice(2);
+      if (p.startsWith('/')) p = p.slice(1);
+      
+      if (p.endsWith('/') && !p.endsWith('**/')) p = `${p}**`;
+      
+      normalized.add(p);
+      
+      if (!p.includes('*') && !p.includes('/')) {
+        normalized.add(`**/${p}`);
+        normalized.add(`**/${p}/**`);
+      }
+    });
+
+    return Array.from(normalized);
   }
 
   private mergeFiles(files: FileData[]): string {
