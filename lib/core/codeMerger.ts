@@ -16,13 +16,15 @@ export class CodeMerger {
     try {
       const files = await this.collectFiles();
       const content = this.mergeFiles(files);
-      this.writeOutput(content);
+      
+      if (this.options.writeOutput) this.writeOutput(content);
       
       return {
         success: true,
         outputPath: this.options.outputPath,
         filesProcessed: files.length,
-        errors: []
+        errors: [],
+        content
       };
     } catch (error) {
       return {

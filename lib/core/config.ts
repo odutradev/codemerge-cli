@@ -112,7 +112,8 @@ export class Config {
       ignorePatterns,
       includePatterns: options.includePatterns || config.includePatterns || this.DEFAULT_INCLUDE_PATTERNS,
       useGitignore: options.useGitignore ?? config.useGitignore ?? true,
-      port: options.port ?? config.port ?? this.DEFAULT_PORT
+      port: options.port ?? config.port ?? this.DEFAULT_PORT,
+      writeOutput: options.writeOutput ?? true
     };
   }
 

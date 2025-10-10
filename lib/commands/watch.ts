@@ -24,6 +24,7 @@ export class WatchCommand {
         inputPath,
         outputPath: options.output,
         watch: true,
+        writeOutput: false,
         ignorePatterns: options.ignore ? options.ignore.split(',') : undefined,
         includePatterns: options.include ? options.include.split(',') : undefined
       });
@@ -66,14 +67,8 @@ export class WatchCommand {
       return;
     }
     
-    const content = await this.readMergedContent(result.outputPath);
-    cache.set(content);
+    if (result.content) cache.set(result.content);
     Logger.success(`Merged ${result.filesProcessed} files`);
-  }
-
-  private async readMergedContent(outputPath: string): Promise<string> {
-    const { readFileSync } = await import('fs');
-    return readFileSync(outputPath, 'utf-8');
   }
 
   private getProjectName(outputPath: string): string {

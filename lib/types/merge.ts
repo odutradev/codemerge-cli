@@ -7,6 +7,7 @@ export interface MergeOptions {
   includePatterns: string[];
   useGitignore: boolean;
   port: number;
+  writeOutput: boolean;
 }
 
 export interface FileData {
@@ -20,6 +21,7 @@ export interface MergeResult {
   outputPath: string;
   filesProcessed: number;
   errors: string[];
+  content?: string;
 }
 
 export interface UpsertFile {
