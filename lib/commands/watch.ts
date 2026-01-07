@@ -34,13 +34,15 @@ export class WatchCommand {
       const cache = new MergeCache();
       const basePath = resolve(mergeOptions.inputPath);
       
-      await this.performInitialMerge(mergeOptions, cache);
+      const merger = new CodeMerger(mergeOptions);
+      await this.performInitialMerge(merger, cache);
       
       const server = new HttpServer(port, projectName, cache, basePath);
+      server.setMerger(merger, mergeOptions);
       await server.start();
       
       const watcher = new FileWatcher(mergeOptions, async () => {
-        await this.performInitialMerge(mergeOptions, cache);
+        await this.performInitialMerge(merger, cache);
       });
       watcher.start();
       
@@ -48,6 +50,8 @@ export class WatchCommand {
       
       Logger.success(`Server running at http://localhost:${port}`);
       Logger.plain(`  Merge endpoint: http://localhost:${port}/content`);
+      Logger.plain(`  Structure endpoint: http://localhost:${port}/structure`);
+      Logger.plain(`  Selective content: http://localhost:${port}/selective-content`);
       Logger.plain(`  Upsert endpoint: http://localhost:${port}/upsert`);
       Logger.plain(`  Health endpoint: http://localhost:${port}/health`);
       Logger.plain('Press Ctrl+C to stop');
@@ -57,8 +61,7 @@ export class WatchCommand {
     }
   }
 
-  private async performInitialMerge(options: any, cache: MergeCache): Promise<void> {
-    const merger = new CodeMerger(options);
+  private async performInitialMerge(merger: CodeMerger, cache: MergeCache): Promise<void> {
     const result = await merger.execute();
     
     if (!result.success) {

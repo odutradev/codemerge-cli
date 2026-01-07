@@ -3,7 +3,7 @@ import { glob } from 'glob';
 
 import { FileUtils } from '../utils/fileUtils.js';
 
-import type { MergeOptions, MergeResult, FileData } from '../types/merge.js';
+import type { MergeOptions, MergeResult, FileData, ProjectStructure, ProjectNode } from '../types/merge.js';
 
 export class CodeMerger {
   private options: MergeOptions;
@@ -34,6 +34,121 @@ export class CodeMerger {
         errors: [error instanceof Error ? error.message : 'Unknown error']
       };
     }
+  }
+
+  public async getProjectStructure(): Promise<ProjectStructure> {
+    const files = await this.collectFiles();
+    const root = this.buildTreeStructure(files);
+    
+    const fileTypes: Record<string, number> = {};
+    let totalDirectories = 0;
+    
+    const countNodes = (node: ProjectNode) => {
+      if (node.type === 'directory') {
+        totalDirectories++;
+        node.children?.forEach(countNodes);
+      } else {
+        const ext = node.name.split('.').pop() || 'unknown';
+        fileTypes[ext] = (fileTypes[ext] || 0) + 1;
+      }
+    };
+    
+    countNodes(root);
+    
+    return {
+      root,
+      totalFiles: files.length,
+      totalDirectories,
+      fileTypes
+    };
+  }
+
+  public async getSelectiveContent(selectedPaths: string[]): Promise<MergeResult> {
+    try {
+      const allFiles = await this.collectFiles();
+      const selectedFiles = allFiles.filter(file => 
+        selectedPaths.some(selected => {
+          const normalizedSelected = selected.replace(/\\/g, '/');
+          const normalizedFile = file.relativePath.replace(/\\/g, '/');
+          return normalizedFile === normalizedSelected || normalizedFile.startsWith(normalizedSelected + '/');
+        })
+      );
+      
+      const content = this.mergeFiles(selectedFiles);
+      
+      return {
+        success: true,
+        outputPath: this.options.outputPath,
+        filesProcessed: selectedFiles.length,
+        errors: [],
+        content
+      };
+    } catch (error) {
+      return {
+        success: false,
+        outputPath: this.options.outputPath,
+        filesProcessed: 0,
+        errors: [error instanceof Error ? error.message : 'Unknown error']
+      };
+    }
+  }
+
+  private buildTreeStructure(files: FileData[]): ProjectNode {
+    const root: ProjectNode = {
+      name: '.',
+      type: 'directory',
+      path: '.',
+      children: []
+    };
+
+    const nodeMap = new Map<string, ProjectNode>();
+    nodeMap.set('.', root);
+
+    files.forEach(file => {
+      const parts = file.relativePath.split(/[/\\]/);
+      let currentPath = '.';
+      
+      for (let i = 0; i < parts.length; i++) {
+        const part = parts[i];
+        const isFile = i === parts.length - 1;
+        const newPath = currentPath === '.' ? part : `${currentPath}/${part}`;
+        
+        if (!nodeMap.has(newPath)) {
+          const node: ProjectNode = {
+            name: part,
+            type: isFile ? 'file' : 'directory',
+            path: newPath,
+            ...(isFile && { lines: file.content.split('\n').length }),
+            ...(!isFile && { children: [] })
+          };
+          
+          const parentNode = nodeMap.get(currentPath);
+          if (parentNode && parentNode.children) {
+            parentNode.children.push(node);
+          }
+          
+          nodeMap.set(newPath, node);
+        }
+        
+        currentPath = newPath;
+      }
+    });
+
+    const sortNodes = (node: ProjectNode) => {
+      if (node.children) {
+        node.children.sort((a, b) => {
+          if (a.type !== b.type) {
+            return a.type === 'directory' ? -1 : 1;
+          }
+          return a.name.localeCompare(b.name);
+        });
+        node.children.forEach(sortNodes);
+      }
+    };
+    
+    sortNodes(root);
+    
+    return root;
   }
 
   private async collectFiles(): Promise<FileData[]> {

@@ -2,10 +2,11 @@ import { createServer, Server, IncomingMessage, ServerResponse } from 'http';
 import { resolve, join } from 'path';
 
 import { MergeCache } from './mergeCache.js';
+import { CodeMerger } from './codeMerger.js';
 import { FileUtils } from '../utils/fileUtils.js';
 import { Logger } from '../utils/logger.js';
 
-import type { UpsertRequest, UpsertResult } from '../types/merge.js';
+import type { UpsertRequest, UpsertResult, SelectiveContentRequest, MergeOptions } from '../types/merge.js';
 
 export class HttpServer {
   private server: Server | null = null;
@@ -13,12 +14,19 @@ export class HttpServer {
   private projectName: string;
   private cache: MergeCache;
   private basePath: string;
+  private merger: CodeMerger | null = null;
+  private mergeOptions: MergeOptions | null = null;
 
   constructor(port: number, projectName: string, cache: MergeCache, basePath: string = process.cwd()) {
     this.port = port;
     this.projectName = projectName;
     this.cache = cache;
     this.basePath = basePath;
+  }
+
+  public setMerger(merger: CodeMerger, options: MergeOptions): void {
+    this.merger = merger;
+    this.mergeOptions = options;
   }
 
   public async start(): Promise<void> {
@@ -59,6 +67,16 @@ export class HttpServer {
       this.handleMergeEndpoint(res);
       return;
     }
+
+    if (url === '/structure' || url === '/structure/') {
+      this.handleStructureEndpoint(res);
+      return;
+    }
+
+    if (url === '/selective-content' && method === 'POST') {
+      this.handleSelectiveContentEndpoint(req, res);
+      return;
+    }
     
     if (url === '/health' || url === '/') {
       this.handleHealthEndpoint(res);
@@ -66,6 +84,75 @@ export class HttpServer {
     }
     
     this.handleNotFound(res);
+  }
+
+  private async handleStructureEndpoint(res: ServerResponse): Promise<void> {
+    if (!this.merger) {
+      res.writeHead(503, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Merger not initialized' }));
+      return;
+    }
+
+    try {
+      const structure = await this.merger.getProjectStructure();
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(structure));
+    } catch (error) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ 
+        error: error instanceof Error ? error.message : 'Failed to generate structure' 
+      }));
+    }
+  }
+
+  private handleSelectiveContentEndpoint(req: IncomingMessage, res: ServerResponse): void {
+    let body = '';
+    
+    req.on('data', chunk => body += chunk.toString());
+    
+    req.on('end', async () => {
+      try {
+        if (!this.merger) {
+          res.writeHead(503, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Merger not initialized' }));
+          return;
+        }
+
+        const data = JSON.parse(body) as SelectiveContentRequest;
+        
+        if (!data.selectedPaths || !Array.isArray(data.selectedPaths)) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'selectedPaths array is required' }));
+          return;
+        }
+
+        const result = await this.merger.getSelectiveContent(data.selectedPaths);
+        
+        if (!result.success) {
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ 
+            error: 'Failed to generate content',
+            details: result.errors 
+          }));
+          return;
+        }
+
+        res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+        res.end(result.content);
+        
+        Logger.success(`Generated selective content with ${result.filesProcessed} files`);
+      } catch (error) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ 
+          error: error instanceof Error ? error.message : 'Invalid request' 
+        }));
+      }
+    });
+
+    req.on('error', error => {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: error.message }));
+    });
   }
 
   private handleUpsertEndpoint(req: IncomingMessage, res: ServerResponse): void {
@@ -191,6 +278,8 @@ export class HttpServer {
       project: this.projectName,
       endpoints: {
         merge: '/content',
+        structure: '/structure',
+        selectiveContent: '/selective-content',
         upsert: '/upsert',
         health: '/health'
       },
@@ -202,7 +291,7 @@ export class HttpServer {
     res.writeHead(404, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({
       error: 'Not found',
-      availableEndpoints: ['/', '/health', '/content', '/upsert']
+      availableEndpoints: ['/', '/health', '/content', '/structure', '/selective-content', '/upsert']
     }));
   }
 }
