@@ -136,7 +136,7 @@ export class CodeMerger {
 
     const sortNodes = (node: ProjectNode) => {
       if (node.children) {
-        node.children.sort((a, b) => {
+        node.children.sort((a: ProjectNode, b: ProjectNode) => {
           if (a.type !== b.type) {
             return a.type === 'directory' ? -1 : 1;
           }

@@ -45,3 +45,22 @@ export interface UpsertResult {
     error?: string;
   }>;
 }
+
+export interface ProjectNode {
+  name: string;
+  type: 'file' | 'directory';
+  path: string;
+  lines?: number;
+  children?: ProjectNode[];
+}
+
+export interface ProjectStructure {
+  root: ProjectNode;
+  totalFiles: number;
+  totalDirectories: number;
+  fileTypes: Record<string, number>;
+}
+
+export interface SelectiveContentRequest {
+  selectedPaths: string[];
+}
