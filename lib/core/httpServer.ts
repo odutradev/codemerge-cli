@@ -55,7 +55,7 @@ export class HttpServer {
       return;
     }
     
-    if (url === `/${this.projectName}` || url === `/${this.projectName}/`) {
+    if (url === '/content' || url === '/content/') {
       this.handleMergeEndpoint(res);
       return;
     }
@@ -190,7 +190,7 @@ export class HttpServer {
       status: 'ok',
       project: this.projectName,
       endpoints: {
-        merge: `/${this.projectName}`,
+        merge: '/content',
         upsert: '/upsert',
         health: '/health'
       },
@@ -202,7 +202,7 @@ export class HttpServer {
     res.writeHead(404, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({
       error: 'Not found',
-      availableEndpoints: ['/', '/health', `/${this.projectName}`, '/upsert']
+      availableEndpoints: ['/', '/health', '/content', '/upsert']
     }));
   }
 }

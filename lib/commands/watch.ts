@@ -47,7 +47,7 @@ export class WatchCommand {
       this.setupGracefulShutdown(server, watcher);
       
       Logger.success(`Server running at http://localhost:${port}`);
-      Logger.plain(`  Merge endpoint: http://localhost:${port}/${projectName}`);
+      Logger.plain(`  Merge endpoint: http://localhost:${port}/content`);
       Logger.plain(`  Upsert endpoint: http://localhost:${port}/upsert`);
       Logger.plain(`  Health endpoint: http://localhost:${port}/health`);
       Logger.plain('Press Ctrl+C to stop');
