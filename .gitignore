@@ -3,6 +3,7 @@ dist/
 *.log
 .env
 .DS_Store
+.npmrc
 coverage/
 *.tsbuildinfo
 merged-output.txt
