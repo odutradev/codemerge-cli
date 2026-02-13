@@ -4,38 +4,40 @@ AI-focused code and data preparation utility. Merge multiple files into a single
 
 ## 📋 Table of Contents
 
-- [Overview](#overview)
-- [Installation](#installation)
-- [Quick Start](#quick-start)
-- [Commands](#commands)
-- [Configuration](#configuration)
-- [HTTP Server & API](#http-server--api)
-- [Use Cases](#use-cases)
-- [Advanced Usage](#advanced-usage)
-- [Troubleshooting](#troubleshooting)
+  - [Overview](https://www.google.com/search?q=%23overview)
+  - [Installation](https://www.google.com/search?q=%23installation)
+  - [Quick Start](https://www.google.com/search?q=%23quick-start)
+  - [Commands](https://www.google.com/search?q=%23commands)
+  - [Configuration](https://www.google.com/search?q=%23configuration)
+  - [HTTP Server & API](https://www.google.com/search?q=%23http-server--api)
+  - [Use Cases](https://www.google.com/search?q=%23use-cases)
+  - [Advanced Usage](https://www.google.com/search?q=%23advanced-usage)
+  - [Troubleshooting](https://www.google.com/search?q=%23troubleshooting)
 
----
+-----
 
 ## 🎯 Overview
 
 CodeMerge is a CLI tool that:
 
-- **Merges** multiple code files into a single, structured text file
-- **Optimizes** output for AI tools (ChatGPT, Claude, etc.)
-- **Respects** .gitignore patterns and custom ignore rules
-- **Watches** for file changes and auto-regenerates
-- **Serves** content via HTTP API for dynamic access
-- **Provides** project structure visualization in JSON
-- **Enables** selective file merging via API
+  - **Merges** multiple code files into a single, structured text file
+  - **Optimizes** output for AI tools (ChatGPT, Claude, etc.)
+  - **Respects** .gitignore patterns and custom ignore rules
+  - **Watches** for file changes and auto-regenerates
+  - **Serves** content via HTTP API for dynamic access
+  - **Provides** project structure visualization in JSON
+  - **Enables** selective file merging via API
+  - **Executes** system commands upon file updates (Upsert hooks)
 
 Perfect for:
-- Preparing codebases for AI analysis
-- Generating context for code reviews
-- Creating documentation snapshots
-- Sharing project structure with AI assistants
-- Building AI-powered developer tools
 
----
+  - Preparing codebases for AI analysis
+  - Generating context for code reviews
+  - Creating documentation snapshots
+  - Sharing project structure with AI assistants
+  - Building AI-powered developer tools
+
+-----
 
 ## 📦 Installation
 
@@ -53,13 +55,13 @@ npm install --save-dev codemerge-cli
 
 ### Requirements
 
-- Node.js >= 16.0.0
+  - Node.js \>= 16.0.0
 
----
+-----
 
 ## 🚀 Quick Start
 
-### 1. Initialize Project
+### 1\. Initialize Project
 
 ```bash
 # Initialize in current directory
@@ -73,10 +75,11 @@ codemerge init --force
 ```
 
 This creates:
-- `codemerge.json` - Configuration file
-- Updates `.gitignore` - Adds output file
 
-### 2. Merge Files
+  - `codemerge.json` - Configuration file
+  - Updates `.gitignore` - Adds output file
+
+### 2\. Merge Files
 
 ```bash
 # Merge current directory
@@ -92,7 +95,7 @@ codemerge use --output my-code.txt
 codemerge use --watch
 ```
 
-### 3. Start HTTP Server
+### 3\. Start HTTP Server
 
 ```bash
 # Start server on default port (9876)
@@ -105,7 +108,7 @@ codemerge watch --port 3000
 codemerge watch --output api-code.txt --ignore "*.test.ts"
 ```
 
----
+-----
 
 ## 🎮 Commands
 
@@ -118,23 +121,27 @@ codemerge init [path] [options]
 ```
 
 **Arguments:**
-- `path` - Target directory (default: `.`)
+
+  - `path` - Target directory (default: `.`)
 
 **Options:**
-- `-f, --force` - Overwrite existing configuration
+
+  - `-f, --force` - Overwrite existing configuration
 
 **What it does:**
-- Creates `codemerge.json` with default settings
-- Detects project name from `package.json`
-- Adds output file to `.gitignore`
-- Sets up recommended ignore patterns
+
+  - Creates `codemerge.json` with default settings
+  - Detects project name from `package.json`
+  - Adds output file to `.gitignore`
+  - Sets up recommended ignore patterns
 
 **Example:**
+
 ```bash
 codemerge init ./backend --force
 ```
 
----
+-----
 
 ### `codemerge use`
 
@@ -145,13 +152,15 @@ codemerge use [path] [options]
 ```
 
 **Arguments:**
-- `path` - Input directory to scan (default: `.`)
+
+  - `path` - Input directory to scan (default: `.`)
 
 **Options:**
-- `-o, --output <path>` - Custom output file path
-- `-w, --watch` - Watch for file changes
-- `--ignore <patterns>` - Additional ignore patterns (comma-separated)
-- `--include <patterns>` - Include patterns (comma-separated)
+
+  - `-o, --output <path>` - Custom output file path
+  - `-w, --watch` - Watch for file changes
+  - `--ignore <patterns>` - Additional ignore patterns (comma-separated)
+  - `--include <patterns>` - Include patterns (comma-separated)
 
 **Examples:**
 
@@ -169,7 +178,7 @@ codemerge use --output ai-context.txt
 codemerge use --watch
 
 # Custom filters
-codemerge use --ignore "*.test.ts,*.spec.js" --include "**/*.ts,**/*.js"
+codemerge use --ignore "*.test.ts,*.spec.js" --include "***.js"
 
 # Combine options
 codemerge use ./src --output src-merged.txt --watch
@@ -206,7 +215,7 @@ STARTOFFILE: lib/cli.ts
 ENDOFFILE: lib/cli.ts
 ```
 
----
+-----
 
 ### `codemerge watch`
 
@@ -217,13 +226,15 @@ codemerge watch [path] [options]
 ```
 
 **Arguments:**
-- `path` - Input directory to scan (default: `.`)
+
+  - `path` - Input directory to scan (default: `.`)
 
 **Options:**
-- `-o, --output <path>` - Output file path
-- `-p, --port <number>` - Server port (default: `9876`)
-- `--ignore <patterns>` - Additional ignore patterns
-- `--include <patterns>` - Include patterns
+
+  - `-o, --output <path>` - Output file path
+  - `-p, --port <number>` - Server port (default: `9876`)
+  - `--ignore <patterns>` - Additional ignore patterns
+  - `--include <patterns>` - Include patterns
 
 **Examples:**
 
@@ -238,19 +249,21 @@ codemerge watch --port 8080
 codemerge watch ./src --port 3000
 
 # With filters
-codemerge watch --ignore "*.test.ts" --include "**/*.ts,**/*.tsx"
+codemerge watch --ignore "*.test.ts" --include "***.tsx"
 ```
 
 **Server Endpoints:**
-- `GET /health` - Server health status
-- `GET /content` - Full merged content
-- `GET /structure` - Project structure JSON
-- `POST /selective-content` - Merge selected files
-- `POST /upsert` - Create/update files
 
-See [HTTP Server & API](#http-server--api) for details.
+  - `GET /health` - Server health status
+  - `GET /content` - Full merged content
+  - `GET /structure` - Project structure JSON
+  - `POST /selective-content` - Merge selected files
+  - `POST /upsert` - Create/update files
+  - `GET /command-output` - Get output of the last post-upsert command
 
----
+See [HTTP Server & API](https://www.google.com/search?q=%23http-server--api) for details.
+
+-----
 
 ### `codemerge help`
 
@@ -272,7 +285,7 @@ codemerge help use
 codemerge help watch
 ```
 
----
+-----
 
 ### `codemerge version`
 
@@ -282,7 +295,7 @@ Display version information.
 codemerge version
 ```
 
----
+-----
 
 ## ⚙️ Configuration
 
@@ -294,63 +307,30 @@ codemerge version
   "outputPath": "merged-output.txt",
   "port": 9876,
   "useGitignore": true,
+  "onUpsertCommand": "npm run build",
   "ignorePatterns": [
-    "node_modules/**",
-    ".git/**",
-    "dist/**",
-    "build/**",
-    "**/*.log",
-    "coverage/**"
-  ],
-  "includePatterns": [
-    "**/*.ts",
-    "**/*.js",
-    "**/*.tsx",
-    "**/*.jsx",
-    "**/*.json",
-    "**/*.md"
+    "node_modules*.log",
+    "coverage*.ts",
+    "***.tsx",
+    "***.json",
+    "***.log",
+    "package-lock.json",
+    "yarn.lock",
+    ".env",
+    "**/.DS_Store"
   ]
 }
 ```
 
-### Configuration Options
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `projectName` | `string` | Auto-detected | Project name |
-| `outputPath` | `string` | `merged-output.txt` | Output file path |
-| `port` | `number` | `9876` | HTTP server port |
-| `useGitignore` | `boolean` | `true` | Respect .gitignore rules |
-| `ignorePatterns` | `string[]` | See below | Files/folders to ignore |
-| `includePatterns` | `string[]` | See below | Files to include |
-
-### Default Ignore Patterns
-
-```javascript
-[
-  'node_modules/**',
-  '.git/**',
-  'dist/**',
-  'build/**',
-  'coverage/**',
-  '**/*.log',
-  'package-lock.json',
-  'yarn.lock',
-  '.env',
-  '**/.DS_Store'
-]
-```
+**New Option:** `onUpsertCommand` allows defining a shell command to be executed immediately after a successful POST to `/upsert`.
 
 ### Default Include Patterns
 
 ```javascript
 [
-  '**/*.ts',
-  '**/*.js',
-  '**/*.tsx',
-  '**/*.jsx',
-  '**/*.json',
-  '**/*.md'
+  '***.js',
+  '***.jsx',
+  '***.md'
 ]
 ```
 
@@ -363,13 +343,13 @@ You can also configure in `package.json`:
   "name": "my-project",
   "codemergeConfig": {
     "outputPath": "ai-digest.txt",
-    "ignorePatterns": ["**/*.test.ts"],
-    "includePatterns": ["src/**/*.ts"]
+    "onUpsertCommand": "echo 'Upsert complete'",
+    "ignorePatterns": ["***.ts"]
   }
 }
 ```
 
----
+-----
 
 ## 🌐 HTTP Server & API
 
@@ -381,13 +361,14 @@ codemerge watch --port 9876
 
 ### API Endpoints
 
-#### 1. Health Check
+#### 1\. Health Check
 
 **GET** `/health`
 
 Check server status.
 
 **Response:**
+
 ```json
 {
   "status": "ok",
@@ -397,6 +378,7 @@ Check server status.
     "structure": "/structure",
     "selectiveContent": "/selective-content",
     "upsert": "/upsert",
+    "commandOutput": "/command-output",
     "health": "/health"
   },
   "mergeReady": true
@@ -404,19 +386,21 @@ Check server status.
 ```
 
 **Example:**
+
 ```bash
 curl http://localhost:9876/health
 ```
 
----
+-----
 
-#### 2. Get Merged Content
+#### 2\. Get Merged Content
 
 **GET** `/content`
 
 Get full merged content of all files.
 
 **Response:**
+
 ```
 # Code Merge Output
 Generated at: 2026-01-07T01:02:50.588Z
@@ -425,19 +409,21 @@ Generated at: 2026-01-07T01:02:50.588Z
 ```
 
 **Example:**
+
 ```bash
 curl http://localhost:9876/content > output.txt
 ```
 
----
+-----
 
-#### 3. Get Project Structure
+#### 3\. Get Project Structure
 
 **GET** `/structure`
 
 Get project structure as JSON tree.
 
 **Response:**
+
 ```json
 {
   "root": {
@@ -478,11 +464,13 @@ Get project structure as JSON tree.
 ```
 
 **Example:**
+
 ```bash
 curl http://localhost:9876/structure | jq
 ```
 
 **Frontend Integration:**
+
 ```javascript
 async function getProjectStructure() {
   const response = await fetch('http://localhost:9876/structure');
@@ -491,15 +479,16 @@ async function getProjectStructure() {
 }
 ```
 
----
+-----
 
-#### 4. Get Selective Content
+#### 4\. Get Selective Content
 
 **POST** `/selective-content`
 
 Merge only selected files/folders.
 
 **Request Body:**
+
 ```json
 {
   "selectedPaths": [
@@ -511,6 +500,7 @@ Merge only selected files/folders.
 ```
 
 **Response:**
+
 ```
 # Code Merge Output
 Generated at: 2026-01-07T01:02:50.588Z
@@ -520,6 +510,7 @@ Files processed: 5
 ```
 
 **Example:**
+
 ```bash
 curl -X POST http://localhost:9876/selective-content \
   -H "Content-Type: application/json" \
@@ -532,6 +523,7 @@ curl -X POST http://localhost:9876/selective-content \
 ```
 
 **Frontend Integration:**
+
 ```javascript
 async function getSelectiveContent(selectedPaths) {
   const response = await fetch('http://localhost:9876/selective-content', {
@@ -541,8 +533,6 @@ async function getSelectiveContent(selectedPaths) {
   });
   return await response.text();
 }
-
-// Usage
 const content = await getSelectiveContent([
   'src/core/codeMerger.ts',
   'src/types'
@@ -551,15 +541,16 @@ const content = await getSelectiveContent([
 
 **Note:** When you select a folder, all files within it are automatically included.
 
----
+-----
 
-#### 5. Upsert Files
+#### 5\. Upsert Files
 
 **POST** `/upsert`
 
-Create or update files in the project.
+Create or update files in the project. If `onUpsertCommand` is configured, it will be executed after a successful upsert.
 
 **Request Body:**
+
 ```json
 {
   "basePath": "./",
@@ -577,6 +568,7 @@ Create or update files in the project.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -598,6 +590,7 @@ Create or update files in the project.
 ```
 
 **Example:**
+
 ```bash
 curl -X POST http://localhost:9876/upsert \
   -H "Content-Type: application/json" \
@@ -611,11 +604,45 @@ curl -X POST http://localhost:9876/upsert \
   }'
 ```
 
----
+-----
+
+#### 6\. Get Command Output
+
+**GET** `/command-output`
+
+Retrieves the result (stdout/stderr) of the last executed command triggered by an upsert operation. Requires `onUpsertCommand` to be set in configuration.
+
+**Response:**
+
+```json
+{
+  "timestamp": "2026-02-13T12:30:00.000Z",
+  "command": "npm run build",
+  "output": "Build successful...",
+  "error": null,
+  "success": true
+}
+```
+
+OR (if no command was executed):
+
+```json
+{
+  "status": "no_command_executed"
+}
+```
+
+**Example:**
+
+```bash
+curl http://localhost:9876/command-output
+```
+
+-----
 
 ## 💡 Use Cases
 
-### 1. AI Code Analysis
+### 1\. AI Code Analysis
 
 Prepare your entire codebase for AI analysis:
 
@@ -628,7 +655,7 @@ cat for-ai.txt | pbcopy  # macOS
 cat for-ai.txt | xclip   # Linux
 ```
 
-### 2. Code Review Context
+### 2\. Code Review Context
 
 Generate context for code reviews:
 
@@ -637,38 +664,31 @@ Generate context for code reviews:
 codemerge use ./src --output review-context.txt --ignore "*.test.ts,*.spec.js"
 ```
 
-### 3. Documentation Generation
+### 3\. Documentation Generation
 
 Create documentation snapshots:
 
 ```bash
 # Include docs and source
-codemerge use --include "**/*.md,**/*.ts" --output docs-snapshot.txt
+codemerge use --include "***.ts" --output docs-snapshot.txt
 ```
 
-### 4. AI-Powered Developer Tools
+### 4\. AI-Powered Developer Tools
 
 Build tools that need dynamic project access:
 
 ```javascript
-// Get project structure
 const structure = await fetch('http://localhost:9876/structure').then(r => r.json());
-
-// Let user select files in UI
 const selectedPaths = userSelection;
-
-// Get only selected content
 const content = await fetch('http://localhost:9876/selective-content', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({ selectedPaths })
 }).then(r => r.text());
-
-// Send to AI
 await sendToAI(content);
 ```
 
-### 5. Continuous Context Updates
+### 5\. Continuous Context Updates
 
 Watch mode for real-time updates:
 
@@ -683,7 +703,7 @@ while true; do
 done
 ```
 
-### 6. Multi-Project Monitoring
+### 6\. Multi-Project Monitoring
 
 Monitor multiple projects:
 
@@ -698,25 +718,22 @@ cd ~/project2 && codemerge watch --port 9002
 cd ~/project3 && codemerge watch --port 9003
 ```
 
----
+-----
 
 ## 🔧 Advanced Usage
 
 ### Custom Patterns
 
 #### Include TypeScript Only
+
 ```bash
-codemerge use --include "**/*.ts,**/*.tsx"
+codemerge use --include "***.tsx"
 ```
 
 #### Exclude Tests and Configs
-```bash
-codemerge use --ignore "**/*.test.ts,**/*.spec.js,**/*.config.js"
-```
 
-#### Specific Directories
 ```bash
-codemerge use --include "src/**/*.ts,lib/**/*.ts"
+codemerge use --ignore "***.spec.js,***.ts,lib*.ts"
 ```
 
 ### Combining Options
@@ -726,168 +743,33 @@ codemerge use \
   ./backend \
   --output backend-code.txt \
   --watch \
-  --ignore "**/*.test.ts,**/migrations/**" \
-  --include "**/*.ts,**/*.js"
-```
-
-### Environment-Specific Configs
-
-Create multiple config files:
-
-**codemerge.dev.json:**
-```json
-{
-  "outputPath": "dev-merged.txt",
-  "includePatterns": ["**/*.ts", "**/*.tsx"]
-}
-```
-
-**codemerge.prod.json:**
-```json
-{
-  "outputPath": "prod-merged.txt",
-  "ignorePatterns": ["**/*.test.ts", "**/*.dev.ts"]
-}
-```
-
-Use with symbolic links:
-```bash
-ln -sf codemerge.dev.json codemerge.json
-codemerge use
-```
-
-### Scripting
-
-**package.json:**
-```json
-{
-  "scripts": {
-    "merge": "codemerge use",
-    "merge:watch": "codemerge use --watch",
-    "serve": "codemerge watch --port 3000",
-    "merge:src": "codemerge use ./src --output src-only.txt"
-  }
-}
-```
-
-```bash
-npm run merge
-npm run serve
-```
-
-### CI/CD Integration
-
-**GitHub Actions:**
-```yaml
-- name: Generate Code Context
-  run: |
-    npm install -g codemerge-cli
-    codemerge use --output code-context.txt
-    
-- name: Upload Artifact
-  uses: actions/upload-artifact@v2
-  with:
-    name: code-context
-    path: code-context.txt
-```
-
----
-
-## 🐛 Troubleshooting
-
-### Port Already in Use
-
-```
-Error: Port 9876 is already in use
-```
-
-**Solution:**
-```bash
-# Use different port
-codemerge watch --port 8080
-
-# Or find and kill the process
-lsof -ti:9876 | xargs kill -9
-```
-
-### Large Output Files
-
-If output is too large:
-
-```bash
-# Limit to specific directories
-codemerge use ./src ./lib
-
-# Exclude verbose files
-codemerge use --ignore "**/*.json,**/*.lock,**/*.min.js"
+  --ignore "**migrations*.ts,***.ts", "***.test.ts", "***.json,***.min.js"
 
 # Include only specific types
-codemerge use --include "**/*.ts"
+codemerge use --include "***.png,***.pdf"
 ```
 
-### Files Not Being Merged
-
-**Check .gitignore:**
-```bash
-# Disable gitignore checking
-# Edit codemerge.json:
-{
-  "useGitignore": false
-}
-```
-
-**Check patterns:**
-```bash
-# Add debug logging (in code)
-console.log('Include patterns:', includePatterns);
-console.log('Ignore patterns:', ignorePatterns);
-```
-
-### Watch Not Detecting Changes
-
-**Increase delay:**
-Edit `codemerge.json`:
-```json
-{
-  "watchDelay": 3000
-}
-```
-
-**Check file permissions:**
-```bash
-ls -la | grep codemerge
-```
-
-### Binary Files in Output
-
-Binary files are automatically excluded. If you see them:
-
-```bash
-# Explicitly ignore
-codemerge use --ignore "**/*.png,**/*.jpg,**/*.pdf"
-```
-
----
+-----
 
 ## 📚 Additional Resources
 
-- **GitHub:** [github.com/odutradev/codemerge-cli](https://github.com/odutradev/codemerge-cli)
-- **Issues:** [Report bugs](https://github.com/odutradev/codemerge-cli/issues)
-- **NPM:** [npmjs.com/package/codemerge-cli](https://www.npmjs.com/package/codemerge-cli)
+  - **GitHub:** [github.com/odutradev/codemerge-cli](https://github.com/odutradev/codemerge-cli)
+  - **Issues:** [Report bugs](https://github.com/odutradev/codemerge-cli/issues)
+  - **NPM:** [npmjs.com/package/codemerge-cli](https://www.npmjs.com/package/codemerge-cli)
 
----
+-----
 
 ## 📝 License
 
-MIT License - feel free to use in your projects!
+MIT License - feel free to use in your projects\!
 
----
+-----
 
 ## 🤝 Contributing
 
-Contributions welcome! Please:
+Contributions welcome\! Please:
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
+1.  Fork the repository
+2.  Create a feature branch
+3.  Make your changes
+4.  Submit a pull request
