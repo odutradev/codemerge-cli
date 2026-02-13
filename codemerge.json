@@ -3,6 +3,7 @@
   "outputPath": "codemerge-cli-merged.txt",
   "port": 9876,
   "useGitignore": true,
+  "onUpsertCommand":"npm run build",
   "ignorePatterns": [
     "node_modules/**",
     ".git/**",

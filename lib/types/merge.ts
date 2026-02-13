@@ -1,64 +1,73 @@
 export interface MergeOptions {
-  inputPath: string;
-  outputPath: string;
-  watch: boolean;
-  watchDelay: number;
-  ignorePatterns: string[];
+  onUpsertCommand?: string;
   includePatterns: string[];
+  ignorePatterns: string[];
+  watchDelay: number;
   useGitignore: boolean;
-  port: number;
   writeOutput: boolean;
+  outputPath: string;
+  inputPath: string;
+  watch: boolean;
+  port: number;
 }
 
 export interface FileData {
-  path: string;
-  content: string;
   relativePath: string;
+  content: string;
+  path: string;
 }
 
 export interface MergeResult {
-  success: boolean;
-  outputPath: string;
-  filesProcessed: number;
-  errors: string[];
   content?: string;
+  filesProcessed: number;
+  outputPath: string;
+  errors: string[];
+  success: boolean;
 }
 
 export interface UpsertFile {
-  path: string;
   content: string;
+  path: string;
 }
 
 export interface UpsertRequest {
-  files: UpsertFile[];
   basePath?: string;
+  files: UpsertFile[];
 }
 
 export interface UpsertResult {
-  success: boolean;
   filesProcessed: number;
   errors: string[];
+  success: boolean;
   results: Array<{
-    path: string;
     action: 'created' | 'updated';
     success: boolean;
     error?: string;
+    path: string;
   }>;
 }
 
+export interface CommandOutput {
+  timestamp: string;
+  command: string;
+  output: string;
+  error?: string;
+  success: boolean;
+}
+
 export interface ProjectNode {
-  name: string;
   type: 'file' | 'directory';
-  path: string;
-  lines?: number;
   children?: ProjectNode[];
+  lines?: number;
+  path: string;
+  name: string;
 }
 
 export interface ProjectStructure {
-  root: ProjectNode;
-  totalFiles: number;
-  totalDirectories: number;
   fileTypes: Record<string, number>;
+  totalDirectories: number;
+  totalFiles: number;
+  root: ProjectNode;
 }
 
 export interface SelectiveContentRequest {

@@ -54,6 +54,7 @@ export class WatchCommand {
       Logger.plain(`  Selective content: http://localhost:${port}/selective-content`);
       Logger.plain(`  Upsert endpoint: http://localhost:${port}/upsert`);
       Logger.plain(`  Health endpoint: http://localhost:${port}/health`);
+      Logger.plain(`  Health endpoint: http://localhost:${port}/command-output`);
       Logger.plain('Press Ctrl+C to stop');
     } catch (error) {
       Logger.error(error instanceof Error ? error.message : 'Unexpected error occurred');

@@ -3,8 +3,8 @@ import { join } from 'path';
 import { FileUtils } from '../utils/fileUtils.js';
 import { PathUtils } from '../utils/pathUtils.js';
 
-import type { MergeOptions } from '../types/merge.js';
 import type { ConfigFile } from '../types/config.js';
+import type { MergeOptions } from '../types/merge.js';
 
 export class Config {
   private static readonly CONFIG_FILENAMES = [
@@ -14,34 +14,14 @@ export class Config {
 
   private static readonly DEFAULT_IGNORE_PATTERNS = [
     'node_modules',
-    'node_modules/**',
-    '**/node_modules',
-    '**/node_modules/**',
-    '.git',
-    '.git/**',
-    '**/.git',
-    '**/.git/**',
-    'dist',
-    'dist/**',
-    '**/dist',
-    '**/dist/**',
-    'build',
-    'build/**',
-    '**/build',
-    '**/build/**',
-    'coverage',
-    'coverage/**',
-    '**/coverage',
-    '**/coverage/**',
-    '.next',
-    '.next/**',
-    '**/.next',
-    '**/.next/**',
-    '.nuxt',
-    '.nuxt/**',
-    '**/.nuxt',
-    '**/.nuxt/**',
-    '**/*.log',
+    'node_modulesnode_modules',
+    '**/node_modules.git',
+    '**/.gitdist',
+    '**/distbuild',
+    '**/buildcoverage',
+    '**/coverage.next',
+    '**/.next.nuxt',
+    '**/.nuxt*.log',
     '**/package-lock.json',
     '**/yarn.lock',
     '**/pnpm-lock.yaml',
@@ -57,26 +37,23 @@ export class Config {
   ];
 
   private static readonly DEFAULT_INCLUDE_PATTERNS = [
-    '**/*.ts',
-    '**/*.js',
-    '**/*.tsx',
-    '**/*.jsx',
-    '**/*.json',
-    '**/*.md'
+    '***.js',
+    '***.jsx',
+    '***.md'
   ];
 
   private static readonly DEFAULT_PORT = 9876;
 
   public static load(basePath: string): ConfigFile {
     const resolvedPath = PathUtils.resolve(basePath);
-    
+
     for (const filename of this.CONFIG_FILENAMES) {
       const configPath = join(resolvedPath, filename);
       if (FileUtils.exists(configPath)) {
         return this.parseConfigFile(configPath);
       }
     }
-    
+
     return this.loadPackageJsonConfig(resolvedPath);
   }
 
@@ -113,16 +90,17 @@ export class Config {
       includePatterns: options.includePatterns || config.includePatterns || this.DEFAULT_INCLUDE_PATTERNS,
       useGitignore: options.useGitignore ?? config.useGitignore ?? true,
       port: options.port ?? config.port ?? this.DEFAULT_PORT,
-      writeOutput: options.writeOutput ?? true
+      writeOutput: options.writeOutput ?? true,
+      onUpsertCommand: config.onUpsertCommand
     };
   }
 
   private static mergeIgnorePatterns(configPatterns?: string[], optionPatterns?: string[], outputPath?: string): string[] {
     const patterns = new Set([...this.DEFAULT_IGNORE_PATTERNS]);
-    
+
     if (configPatterns) configPatterns.forEach(p => patterns.add(p));
     if (optionPatterns) optionPatterns.forEach(p => patterns.add(p));
-    
+
     if (outputPath) {
       patterns.add(outputPath);
       patterns.add(`**/${outputPath}`);

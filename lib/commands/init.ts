@@ -18,21 +18,21 @@ export class InitCommand {
   private async execute(targetPath: string, options: InitOptions): Promise<void> {
     try {
       Logger.info('Initializing CodeMerge project...');
-      
+
       const resolvedPath = PathUtils.resolve(targetPath);
       const configPath = join(resolvedPath, 'codemerge.json');
-      
+
       if (!options.force && FileUtils.exists(configPath)) {
         Logger.error('codemerge.json already exists. Use --force to overwrite.');
         process.exit(1);
       }
-      
+
       const projectName = this.getProjectName(resolvedPath);
       const outputPath = projectName ? `${projectName}-merged.txt` : 'merged-output.txt';
-      
+
       this.createConfigFile(configPath, outputPath, projectName);
       this.updateGitignore(resolvedPath, outputPath);
-      
+
       Logger.success('Configuration file created: codemerge.json');
       Logger.plain('Output file added to .gitignore: ' + outputPath);
       Logger.plain('');
@@ -52,8 +52,8 @@ export class InitCommand {
     try {
       const pkg = FileUtils.readJson<{ name?: string }>(packagePath);
       if (!pkg.name) return null;
-      
-      return pkg.name.replace(/^@.*?\//, '').replace(/[^a-zA-Z0-9-_]/g, '-').toLowerCase();
+
+      return pkg.name.replace(/^@.*?\//, '');
     } catch {
       return null;
     }
@@ -65,16 +65,10 @@ export class InitCommand {
       outputPath,
       port: 9876,
       useGitignore: true,
+      onUpsertCommand: "",
       ignorePatterns: [
         'node_modules',
-        'node_modules/**',
-        '.git',
-        '.git/**',
-        'dist',
-        'dist/**',
-        'build',
-        'build/**',
-        '**/*.log',
+        'node_modules*.log',
         'package-lock.json',
         'yarn.lock',
         'pnpm-lock.yaml',
@@ -84,30 +78,19 @@ export class InitCommand {
         '.env.*',
         '**/.DS_Store',
         'coverage',
-        'coverage/**',
-        '.next',
-        '.next/**',
-        '.nuxt',
-        '.nuxt/**',
-        '.vscode',
-        '.idea'
-      ],
-      includePatterns: [
-        '**/*.ts',
-        '**/*.js',
-        '**/*.tsx',
-        '**/*.jsx',
-        '**/*.json',
+        'coverage*.ts',
+        '***.tsx',
+        '***.json',
         '**/*.md'
       ]
     };
-    
+
     FileUtils.write(configPath, JSON.stringify(config, null, 2) + '\n');
   }
 
   private updateGitignore(basePath: string, outputFileName: string): void {
     const gitignorePath = join(basePath, '.gitignore');
-    
+
     if (!FileUtils.exists(gitignorePath)) {
       FileUtils.write(gitignorePath, outputFileName + '\n');
       return;
@@ -115,9 +98,9 @@ export class InitCommand {
 
     const content = readFileSync(gitignorePath, 'utf-8');
     const lines = content.split('\n');
-    
+
     if (lines.some(line => line.trim() === outputFileName)) return;
-    
+
     const newContent = content.endsWith('\n') ? content + outputFileName + '\n' : content + '\n' + outputFileName + '\n';
     FileUtils.write(gitignorePath, newContent);
   }

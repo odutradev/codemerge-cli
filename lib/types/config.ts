@@ -1,16 +1,17 @@
 export interface ConfigFile {
+  onUpsertCommand?: string;
+  includePatterns?: string[];
+  ignorePatterns?: string[];
+  useGitignore?: boolean;
+  projectName?: string;
   outputPath?: string;
   port?: number;
-  ignorePatterns?: string[];
-  includePatterns?: string[];
-  projectName?: string;
-  useGitignore?: boolean;
 }
 
 export interface CommandOptions {
+  include?: string;
+  ignore?: string;
   output?: string;
   watch?: boolean;
-  ignore?: string;
-  include?: string;
   port?: string;
 }
