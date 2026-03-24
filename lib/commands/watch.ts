@@ -1,13 +1,13 @@
-import { Command } from 'commander';
 import { basename, resolve } from 'path';
+import { Command } from 'commander';
 
 import { ProcessUtils } from '../utils/processUtils.js';
+import { FileWatcher } from '../core/fileWatcher.js';
 import { HttpServer } from '../core/httpServer.js';
 import { CodeMerger } from '../core/codeMerger.js';
-import { Config } from '../core/config.js';
 import { MergeCache } from '../core/mergeCache.js';
-import { FileWatcher } from '../core/fileWatcher.js';
 import { Logger } from '../utils/logger.js';
+import { Config } from '../core/config.js';
 
 import type { CommandOptions } from '../types/config.js';
 
@@ -30,9 +30,7 @@ export class WatchCommand {
         includePatterns: options.include ? options.include.split(',') : undefined
       });
 
-      if (mergeOptions.onStartCommand) {
-        ProcessUtils.runCommand(mergeOptions.onStartCommand, mergeOptions.onStartCommandLogs);
-      }
+      if (mergeOptions.onStartCommand) ProcessUtils.runCommand(mergeOptions.onStartCommand, mergeOptions.onStartCommandLogs);
 
       const projectName = this.getProjectName(mergeOptions.outputPath);
       const port = parseInt(options.port || '9876', 10);
@@ -58,8 +56,10 @@ export class WatchCommand {
       Logger.plain(`  Structure endpoint: http://localhost:${port}/structure`);
       Logger.plain(`  Selective content: http://localhost:${port}/selective-content`);
       Logger.plain(`  Upsert endpoint: http://localhost:${port}/upsert`);
+      Logger.plain(`  Delete files endpoint: http://localhost:${port}/delete-files`);
+      Logger.plain(`  Commit endpoint: http://localhost:${port}/commit`);
+      Logger.plain(`  Command output endpoint: http://localhost:${port}/command-output`);
       Logger.plain(`  Health endpoint: http://localhost:${port}/health`);
-      Logger.plain(`  Health endpoint: http://localhost:${port}/command-output`);
       Logger.plain('Press Ctrl+C to stop');
     } catch (error) {
       Logger.error(error instanceof Error ? error.message : 'Unexpected error occurred');

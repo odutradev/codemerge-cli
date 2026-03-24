@@ -56,7 +56,7 @@ npm install --save-dev codemerge-cli
 
 ### Requirements
 
-  - Node.js >= 16.0.0
+  - Node.js \>= 16.0.0
 
 -----
 
@@ -232,8 +232,6 @@ codemerge watch --ignore "*.test.ts" --include "***.tsx"
   - `POST /delete-files` - Delete specific files
   - `POST /commit` - Execute local git commit
   - `GET /command-output` - Get output of the last post-upsert command
-
-See HTTP Server & API for details.
 
 -----
 
