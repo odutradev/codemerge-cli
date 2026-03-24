@@ -1,46 +1,25 @@
 import { join } from 'path';
 
-import { FileUtils } from '../utils/fileUtils.js';
 import { PathUtils } from '../utils/pathUtils.js';
+import { FileUtils } from '../utils/fileUtils.js';
 
-import type { ConfigFile } from '../types/config.js';
 import type { MergeOptions } from '../types/merge.js';
+import type { ConfigFile } from '../types/config.js';
 
 export class Config {
-  private static readonly CONFIG_FILENAMES = [
-    'codemerge.json',
-    'codemerge.config.json'
-  ];
+  private static readonly CONFIG_FILENAMES = ['codemerge.json', 'codemerge.config.json'];
 
   private static readonly DEFAULT_IGNORE_PATTERNS = [
-    'node_modules',
-    'node_modulesnode_modules',
-    '**/node_modules.git',
-    '**/.gitdist',
-    '**/distbuild',
-    '**/buildcoverage',
-    '**/coverage.next',
-    '**/.next.nuxt',
-    '**/.nuxt*.log',
-    '**/package-lock.json',
-    '**/yarn.lock',
-    '**/pnpm-lock.yaml',
-    '**/.env',
-    '**/.env.*',
-    '**/.DS_Store',
-    '**/Thumbs.db',
-    '**/.vscode',
-    '**/.idea',
-    '**/codemerge.json',
-    '**/codemerge.config.json',
-    '**/merged-output.txt'
+    'node_modules', '**/node_modules', '.git', '**/.git',
+    'dist', '**/dist', 'build', '**/build', 'coverage', '**/coverage',
+    '.next', '**/.next', '.nuxt', '**/.nuxt', '*.log', '**package-lock.json', 'yarn.lock', '**/yarn.lock',
+    'pnpm-lock.yaml', '**/pnpm-lock.yaml', '.env', '**/.env', '.env.*', '**/.env.*',
+    '.DS_Store', '**/.DS_Store', 'Thumbs.db', '**/Thumbs.db',
+    '.vscode', '**/.vscode', '.idea', '**/.idea',
+    'codemerge.json', '**/codemerge.json', 'codemerge.config.json', '**/codemerge.config.json'
   ];
 
-  private static readonly DEFAULT_INCLUDE_PATTERNS = [
-    '***.js',
-    '***.jsx',
-    '***.md'
-  ];
+  private static readonly DEFAULT_INCLUDE_PATTERNS = ['***.js', '***.jsx', '***.md'];
 
   private static readonly DEFAULT_PORT = 9876;
 
@@ -49,9 +28,7 @@ export class Config {
 
     for (const filename of this.CONFIG_FILENAMES) {
       const configPath = join(resolvedPath, filename);
-      if (FileUtils.exists(configPath)) {
-        return this.parseConfigFile(configPath);
-      }
+      if (FileUtils.exists(configPath)) return this.parseConfigFile(configPath);
     }
 
     return this.loadPackageJsonConfig(resolvedPath);
@@ -70,8 +47,8 @@ export class Config {
     if (!FileUtils.exists(packagePath)) return {};
 
     try {
-      const pkg = FileUtils.readJson<any>(packagePath);
-      return pkg.codemergeConfig || {};
+      const pkg = FileUtils.readJson<{ codemergeConfig?: ConfigFile }>(packagePath);
+      return pkg.codemergeConfig ?? {};
     } catch {
       return {};
     }
@@ -82,6 +59,7 @@ export class Config {
     const ignorePatterns = this.mergeIgnorePatterns(config.ignorePatterns, options.ignorePatterns, outputPath);
 
     return {
+      projectName: config.projectName,
       inputPath: options.inputPath || process.cwd(),
       outputPath,
       watch: options.watch ?? false,
@@ -100,7 +78,6 @@ export class Config {
 
     if (configPatterns) configPatterns.forEach(p => patterns.add(p));
     if (optionPatterns) optionPatterns.forEach(p => patterns.add(p));
-
     if (outputPath) {
       patterns.add(outputPath);
       patterns.add(`**/${outputPath}`);

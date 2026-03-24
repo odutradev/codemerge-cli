@@ -1,9 +1,9 @@
-import { resolve, relative, join, basename } from 'path';
+import { resolve, relative, basename } from 'path';
 import { glob } from 'glob';
 
 import { FileUtils } from '../utils/fileUtils.js';
 
-import type { MergeOptions, MergeResult, FileData, ProjectStructure, ProjectNode } from '../types/merge.js';
+import type { ProjectStructure, ProjectNode, MergeOptions, MergeResult, FileData } from '../types/merge.js';
 
 export class CodeMerger {
   private options: MergeOptions;
@@ -16,9 +16,9 @@ export class CodeMerger {
     try {
       const files = await this.collectFiles();
       const content = this.mergeFiles(files);
-      
+
       if (this.options.writeOutput) this.writeOutput(content);
-      
+
       return {
         success: true,
         outputPath: this.options.outputPath,
@@ -39,10 +39,10 @@ export class CodeMerger {
   public async getProjectStructure(): Promise<ProjectStructure> {
     const files = await this.collectFiles();
     const root = this.buildTreeStructure(files);
-    
+
     const fileTypes: Record<string, number> = {};
     let totalDirectories = 0;
-    
+
     const countNodes = (node: ProjectNode) => {
       if (node.type === 'directory') {
         totalDirectories++;
@@ -52,9 +52,9 @@ export class CodeMerger {
         fileTypes[ext] = (fileTypes[ext] || 0) + 1;
       }
     };
-    
+
     countNodes(root);
-    
+
     return {
       root,
       totalFiles: files.length,
@@ -66,16 +66,16 @@ export class CodeMerger {
   public async getSelectiveContent(selectedPaths: string[]): Promise<MergeResult> {
     try {
       const allFiles = await this.collectFiles();
-      const selectedFiles = allFiles.filter(file => 
+      const selectedFiles = allFiles.filter(file =>
         selectedPaths.some(selected => {
           const normalizedSelected = selected.replace(/\\/g, '/');
           const normalizedFile = file.relativePath.replace(/\\/g, '/');
           return normalizedFile === normalizedSelected || normalizedFile.startsWith(normalizedSelected + '/');
         })
       );
-      
+
       const content = this.mergeFiles(selectedFiles);
-      
+
       return {
         success: true,
         outputPath: this.options.outputPath,
@@ -94,8 +94,9 @@ export class CodeMerger {
   }
 
   private buildTreeStructure(files: FileData[]): ProjectNode {
+    const rootName = this.options.projectName || basename(resolve(this.options.inputPath)) || '.';
     const root: ProjectNode = {
-      name: '.',
+      name: rootName,
       type: 'directory',
       path: '.',
       children: []
@@ -107,12 +108,12 @@ export class CodeMerger {
     files.forEach(file => {
       const parts = file.relativePath.split(/[/\\]/);
       let currentPath = '.';
-      
+
       for (let i = 0; i < parts.length; i++) {
         const part = parts[i];
         const isFile = i === parts.length - 1;
         const newPath = currentPath === '.' ? part : `${currentPath}/${part}`;
-        
+
         if (!nodeMap.has(newPath)) {
           const node: ProjectNode = {
             name: part,
@@ -121,15 +122,15 @@ export class CodeMerger {
             ...(isFile && { lines: file.content.split('\n').length }),
             ...(!isFile && { children: [] })
           };
-          
+
           const parentNode = nodeMap.get(currentPath);
           if (parentNode && parentNode.children) {
             parentNode.children.push(node);
           }
-          
+
           nodeMap.set(newPath, node);
         }
-        
+
         currentPath = newPath;
       }
     });
@@ -137,17 +138,14 @@ export class CodeMerger {
     const sortNodes = (node: ProjectNode) => {
       if (node.children) {
         node.children.sort((a: ProjectNode, b: ProjectNode) => {
-          if (a.type !== b.type) {
-            return a.type === 'directory' ? -1 : 1;
-          }
+          if (a.type !== b.type) return a.type === 'directory' ? -1 : 1;
           return a.name.localeCompare(b.name);
         });
         node.children.forEach(sortNodes);
       }
     };
-    
+
     sortNodes(root);
-    
     return root;
   }
 
@@ -173,7 +171,7 @@ export class CodeMerger {
               content: FileUtils.read(fullPath),
               relativePath: relative(inputPath, fullPath)
             });
-          } catch (error) {
+          } catch {
             continue;
           }
         }
@@ -185,95 +183,35 @@ export class CodeMerger {
 
   private shouldProcessFile(fullPath: string, inputPath: string): boolean {
     if (!FileUtils.exists(fullPath)) return false;
-    
+
     const relativePath = relative(inputPath, fullPath);
     const outputFileName = basename(this.options.outputPath);
     const configFiles = ['codemerge.json', 'codemerge.config.json'];
-    
+
     if (relativePath === outputFileName || configFiles.includes(relativePath)) return false;
-    
     return true;
   }
 
   private getIgnorePatterns(inputPath: string): string[] {
-    const patterns = [...this.options.ignorePatterns];
-    
+    const patterns = new Set([...this.options.ignorePatterns]);
     const outputFileName = basename(this.options.outputPath);
-    if (!patterns.includes(outputFileName) && !patterns.includes(`**/${outputFileName}`)) {
-      patterns.push(outputFileName);
-      patterns.push(`**/${outputFileName}`);
-    }
 
-    patterns.push('codemerge.json');
-    patterns.push('codemerge.config.json');
-    patterns.push('**/.git/**');
-    patterns.push('**/node_modules/**');
-    
-    if (!this.options.useGitignore) return this.normalizePatterns(patterns);
+    patterns.add(outputFileName);
+    patterns.add(`**/${outputFileName}`);
+    patterns.add('codemerge.json');
+    patterns.add('codemerge.config.json');
 
-    const gitignorePath = join(inputPath, '.gitignore');
-    if (!FileUtils.exists(gitignorePath)) return this.normalizePatterns(patterns);
-
-    try {
-      const content = FileUtils.read(gitignorePath);
-      const gitignorePatterns = this.parseGitignore(content);
-      patterns.push(...gitignorePatterns);
-    } catch (error) {
-      return this.normalizePatterns(patterns);
-    }
-
-    return this.normalizePatterns(patterns);
-  }
-
-  private parseGitignore(content: string): string[] {
-    const patterns: string[] = [];
-    
-    content.split('\n').forEach(line => {
-      const trimmed = line.trim();
-      if (!trimmed || trimmed.startsWith('#')) return;
-      if (trimmed.startsWith('!')) return;
-      
-      let pattern = trimmed;
-      
-      if (pattern.startsWith('/')) {
-        pattern = pattern.slice(1);
-      }
-      
-      if (pattern.endsWith('/')) {
-        patterns.push(`${pattern}**`);
-        patterns.push(`**/${pattern}**`);
-      } else if (pattern.includes('/')) {
-        patterns.push(pattern);
-        if (!pattern.startsWith('**/')) patterns.push(`**/${pattern}`);
-      } else if (pattern.includes('*')) {
-        patterns.push(pattern);
-        patterns.push(`**/${pattern}`);
-      } else {
-        patterns.push(`**/${pattern}`);
-        patterns.push(`**/${pattern}/**`);
-      }
-    });
-
-    return patterns;
-  }
-
-  private normalizePatterns(patterns: string[]): string[] {
     const normalized = new Set<string>();
-    
-    patterns.forEach(pattern => {
-      let p = pattern.trim();
-      if (!p) return;
-      
-      if (p.startsWith('./')) p = p.slice(2);
-      if (p.startsWith('/')) p = p.slice(1);
-      
-      if (p.endsWith('/') && !p.endsWith('**/')) p = `${p}**`;
-      
-      normalized.add(p);
-      
-      if (!p.includes('*') && !p.includes('/')) {
-        normalized.add(`**/${p}`);
-        normalized.add(`**/${p}/**`);
+
+    patterns.forEach(p => {
+      let pat = p.replace(/\\/g, '/');
+      if (pat.startsWith('./')) pat = pat.slice(2);
+      if (pat.endsWith('/')) pat = pat.slice(0, -1);
+
+      normalized.add(pat);
+      if (!pat.includes('*') && !pat.includes('/')) {
+        normalized.add(`**/${pat}`);
+        normalized.add(`**/${pat}/**`);
       }
     });
 
@@ -287,7 +225,7 @@ export class CodeMerger {
     const structure = this.generateStructure(files);
     const header = this.generateHeader(files.length, totalLines, totalChars, breakdown, structure);
     const separator = '='.repeat(80);
-    
+
     const mergedContent = files.map(file => {
       const fileSeparator = '-'.repeat(40);
       return [
@@ -321,7 +259,7 @@ export class CodeMerger {
 
   private generateBreakdown(files: FileData[]): string {
     const typeMap = new Map<string, { count: number; lines: number }>();
-    
+
     files.forEach(file => {
       const ext = file.relativePath.split('.').pop() || 'unknown';
       const lines = file.content.split('\n').length;
@@ -331,20 +269,18 @@ export class CodeMerger {
 
     const sorted = Array.from(typeMap.entries()).sort((a, b) => b[1].count - a[1].count);
     const lines = sorted.map(([ext, data]) => `  - ${ext}: ${data.count} files (${data.lines.toLocaleString()} lines)`);
-    
+
     return ['File types:', ...lines].join('\n');
   }
 
   private generateStructure(files: FileData[]): string {
     const tree: Record<string, FileData[]> = {};
-    
+
     files.forEach(file => {
       const parts = file.relativePath.split(/[/\\]/);
-      
       for (let i = 0; i < parts.length; i++) {
         const path = parts.slice(0, i + 1).join('/');
         const isFile = i === parts.length - 1;
-        
         if (isFile) {
           const dir = i === 0 ? '.' : parts.slice(0, i).join('/');
           if (!tree[dir]) tree[dir] = [];
@@ -354,13 +290,15 @@ export class CodeMerger {
     });
 
     const sortedPaths = Object.keys(tree).sort();
-    const lines = ['Project structure & file index:', './'];
+    const rootName = this.options.projectName || basename(resolve(this.options.inputPath)) || '.';
+    const rootLabel = rootName === '.' ? './' : `${rootName}/`;
+    const lines = ['Project structure & file index:', rootLabel];
     const processed = new Set<string>();
 
     sortedPaths.forEach(path => {
       const parts = path === '.' ? [] : path.split('/');
       const depth = parts.length;
-      
+
       parts.forEach((part, index) => {
         const currentPath = parts.slice(0, index + 1).join('/');
         if (!processed.has(currentPath)) {

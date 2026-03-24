@@ -1,10 +1,11 @@
 export interface MergeOptions {
-  onUpsertCommand?: string;
   includePatterns: string[];
   ignorePatterns: string[];
-  watchDelay: number;
+  onUpsertCommand?: string;
   useGitignore: boolean;
   writeOutput: boolean;
+  projectName?: string;
+  watchDelay: number;
   outputPath: string;
   inputPath: string;
   watch: boolean;
@@ -18,11 +19,11 @@ export interface FileData {
 }
 
 export interface MergeResult {
-  content?: string;
   filesProcessed: number;
   outputPath: string;
-  errors: string[];
   success: boolean;
+  errors: string[];
+  content?: string;
 }
 
 export interface UpsertFile {
@@ -31,14 +32,14 @@ export interface UpsertFile {
 }
 
 export interface UpsertRequest {
-  basePath?: string;
   files: UpsertFile[];
+  basePath?: string;
 }
 
 export interface UpsertResult {
   filesProcessed: number;
-  errors: string[];
   success: boolean;
+  errors: string[];
   results: Array<{
     action: 'created' | 'updated';
     success: boolean;
@@ -49,10 +50,10 @@ export interface UpsertResult {
 
 export interface CommandOutput {
   timestamp: string;
-  command: string;
-  output: string;
-  error?: string;
   success: boolean;
+  command: string;
+  error?: string;
+  output: string;
 }
 
 export interface ProjectNode {
@@ -81,8 +82,8 @@ export interface DeleteFilesRequest {
 
 export interface DeleteFilesResult {
   filesProcessed: number;
-  errors: string[];
   success: boolean;
+  errors: string[];
   results: Array<{
     success: boolean;
     error?: string;
@@ -91,8 +92,8 @@ export interface DeleteFilesResult {
 }
 
 export interface CommitRequest {
-  basePath?: string;
   message: string;
+  basePath?: string;
 }
 
 export interface CommitResult {
