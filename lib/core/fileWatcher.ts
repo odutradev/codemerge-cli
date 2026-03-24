@@ -2,7 +2,7 @@ import { resolve } from 'path';
 import chokidar from 'chokidar';
 
 import { Logger } from '../utils/logger.js';
-import { PatternUtils } from '../utils/patternUtils.js';
+import { PatternUtils } from '../utils/pattern.js';
 
 import type { MergeOptions } from '../types/merge.js';
 
