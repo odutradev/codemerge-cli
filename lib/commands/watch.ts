@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import { basename, resolve } from 'path';
 
-import { ProcessCmd } from '../utils/proccessCmd.js';
+import { ProcessUtils } from '../utils/processUtils.js';
 import { HttpServer } from '../core/httpServer.js';
 import { CodeMerger } from '../core/codeMerger.js';
 import { Config } from '../core/config.js';
@@ -31,7 +31,7 @@ export class WatchCommand {
       });
 
       if (mergeOptions.onStartCommand) {
-        ProcessCmd.runCommand(mergeOptions.onStartCommand, mergeOptions.onStartCommandLogs);
+        ProcessUtils.runCommand(mergeOptions.onStartCommand, mergeOptions.onStartCommandLogs);
       }
 
       const projectName = this.getProjectName(mergeOptions.outputPath);

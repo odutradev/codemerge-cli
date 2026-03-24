@@ -48,7 +48,7 @@ export class InitCommand {
     try {
       const pkg = FileUtils.readJson<{ name?: string }>(packagePath);
       if (!pkg.name) return null;
-      return pkg.name.replace(/^@.*?\
+      return pkg.name.replace(/^@.*?\//, '').replace(/[^a-zA-Z0-9-_]/g, '-').toLowerCase();
     } catch {
       return null;
     }

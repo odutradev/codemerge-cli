@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 
-import { ProcessCmd } from '../utils/proccessCmd.js';
+import { ProcessUtils } from '../utils/processUtils.js';
 import { CodeMerger } from '../core/codeMerger.js';
 import { Config } from '../core/config.js';
 import { FileWatcher } from '../core/fileWatcher.js';
@@ -27,7 +27,7 @@ export class UseCommand {
       });
 
       if (mergeOptions.onStartCommand) {
-        ProcessCmd.runCommand(mergeOptions.onStartCommand, mergeOptions.onStartCommandLogs);
+        ProcessUtils.runCommand(mergeOptions.onStartCommand, mergeOptions.onStartCommandLogs);
       }
 
       const merger = new CodeMerger(mergeOptions);
