@@ -73,3 +73,30 @@ export interface ProjectStructure {
 export interface SelectiveContentRequest {
   selectedPaths: string[];
 }
+
+export interface DeleteFilesRequest {
+  basePath?: string;
+  files: string[];
+}
+
+export interface DeleteFilesResult {
+  filesProcessed: number;
+  errors: string[];
+  success: boolean;
+  results: Array<{
+    success: boolean;
+    error?: string;
+    path: string;
+  }>;
+}
+
+export interface CommitRequest {
+  basePath?: string;
+  message: string;
+}
+
+export interface CommitResult {
+  success: boolean;
+  output?: string;
+  error?: string;
+}

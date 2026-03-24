@@ -28,6 +28,7 @@ CodeMerge is a CLI tool that:
   - **Provides** project structure visualization in JSON
   - **Enables** selective file merging via API
   - **Executes** system commands upon file updates (Upsert hooks)
+  - **Manages** file deletions and local git commits via API
 
 Perfect for:
 
@@ -55,7 +56,7 @@ npm install --save-dev codemerge-cli
 
 ### Requirements
 
-  - Node.js \>= 16.0.0
+  - Node.js >= 16.0.0
 
 -----
 
@@ -184,37 +185,6 @@ codemerge use --ignore "*.test.ts,*.spec.js" --include "***.js"
 codemerge use ./src --output src-merged.txt --watch
 ```
 
-**Output Format:**
-
-```
-# Code Merge Output
-Generated at: 2026-01-07T01:02:50.588Z
-Source path: .
-Files processed: 21
-Total lines: 1596
-Total characters: 45777
-
-File types:
-  - ts: 17 files (1442 lines)
-  - json: 2 files (80 lines)
-  - js: 1 files (2 lines)
-
-Project structure & file index:
-./
-  lib/
-    - cli.ts (75 lines)
-    core/
-      - codeMerger.ts (273 lines)
-
-================================================================================
-
-STARTOFFILE: lib/cli.ts
-----------------------------------------
-[file content here]
-----------------------------------------
-ENDOFFILE: lib/cli.ts
-```
-
 -----
 
 ### `codemerge watch`
@@ -259,9 +229,11 @@ codemerge watch --ignore "*.test.ts" --include "***.tsx"
   - `GET /structure` - Project structure JSON
   - `POST /selective-content` - Merge selected files
   - `POST /upsert` - Create/update files
+  - `POST /delete-files` - Delete specific files
+  - `POST /commit` - Execute local git commit
   - `GET /command-output` - Get output of the last post-upsert command
 
-See [HTTP Server & API](https://www.google.com/search?q=%23http-server--api) for details.
+See HTTP Server & API for details.
 
 -----
 
@@ -271,18 +243,6 @@ Display help information.
 
 ```bash
 codemerge help [command]
-```
-
-**Examples:**
-
-```bash
-# General help
-codemerge help
-
-# Command-specific help
-codemerge help init
-codemerge help use
-codemerge help watch
 ```
 
 -----
@@ -378,17 +338,13 @@ Check server status.
     "structure": "/structure",
     "selectiveContent": "/selective-content",
     "upsert": "/upsert",
+    "deleteFiles": "/delete-files",
+    "commit": "/commit",
     "commandOutput": "/command-output",
     "health": "/health"
   },
   "mergeReady": true
 }
-```
-
-**Example:**
-
-```bash
-curl http://localhost:9876/health
 ```
 
 -----
@@ -399,21 +355,6 @@ curl http://localhost:9876/health
 
 Get full merged content of all files.
 
-**Response:**
-
-```
-# Code Merge Output
-Generated at: 2026-01-07T01:02:50.588Z
-...
-[merged content]
-```
-
-**Example:**
-
-```bash
-curl http://localhost:9876/content > output.txt
-```
-
 -----
 
 #### 3\. Get Project Structure
@@ -421,63 +362,6 @@ curl http://localhost:9876/content > output.txt
 **GET** `/structure`
 
 Get project structure as JSON tree.
-
-**Response:**
-
-```json
-{
-  "root": {
-    "name": ".",
-    "type": "directory",
-    "path": ".",
-    "children": [
-      {
-        "name": "package.json",
-        "type": "file",
-        "path": "package.json",
-        "lines": 55
-      },
-      {
-        "name": "src",
-        "type": "directory",
-        "path": "src",
-        "children": [
-          {
-            "name": "index.ts",
-            "type": "file",
-            "path": "src/index.ts",
-            "lines": 120
-          }
-        ]
-      }
-    ]
-  },
-  "totalFiles": 21,
-  "totalDirectories": 8,
-  "fileTypes": {
-    "ts": 17,
-    "json": 2,
-    "js": 1,
-    "md": 1
-  }
-}
-```
-
-**Example:**
-
-```bash
-curl http://localhost:9876/structure | jq
-```
-
-**Frontend Integration:**
-
-```javascript
-async function getProjectStructure() {
-  const response = await fetch('http://localhost:9876/structure');
-  const structure = await response.json();
-  return structure;
-}
-```
 
 -----
 
@@ -487,60 +371,6 @@ async function getProjectStructure() {
 
 Merge only selected files/folders.
 
-**Request Body:**
-
-```json
-{
-  "selectedPaths": [
-    "src/core/codeMerger.ts",
-    "src/types",
-    "package.json"
-  ]
-}
-```
-
-**Response:**
-
-```
-# Code Merge Output
-Generated at: 2026-01-07T01:02:50.588Z
-Files processed: 5
-...
-[merged content of selected files]
-```
-
-**Example:**
-
-```bash
-curl -X POST http://localhost:9876/selective-content \
-  -H "Content-Type: application/json" \
-  -d '{
-    "selectedPaths": [
-      "src/core",
-      "package.json"
-    ]
-  }' > selected-output.txt
-```
-
-**Frontend Integration:**
-
-```javascript
-async function getSelectiveContent(selectedPaths) {
-  const response = await fetch('http://localhost:9876/selective-content', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ selectedPaths })
-  });
-  return await response.text();
-}
-const content = await getSelectiveContent([
-  'src/core/codeMerger.ts',
-  'src/types'
-]);
-```
-
-**Note:** When you select a folder, all files within it are automatically included.
-
 -----
 
 #### 5\. Upsert Files
@@ -549,20 +379,22 @@ const content = await getSelectiveContent([
 
 Create or update files in the project. If `onUpsertCommand` is configured, it will be executed after a successful upsert.
 
+-----
+
+#### 6\. Delete Files
+
+**POST** `/delete-files`
+
+Delete specific files from the project.
+
 **Request Body:**
 
 ```json
 {
   "basePath": "./",
   "files": [
-    {
-      "path": "src/new-file.ts",
-      "content": "export const hello = 'world';"
-    },
-    {
-      "path": "README.md",
-      "content": "# Updated content"
-    }
+    "src/obsolete-file.ts",
+    "tests/old-test.spec.ts"
   ]
 }
 ```
@@ -576,67 +408,51 @@ Create or update files in the project. If `onUpsertCommand` is configured, it wi
   "errors": [],
   "results": [
     {
-      "path": "src/new-file.ts",
-      "action": "created",
+      "path": "src/obsolete-file.ts",
       "success": true
     },
     {
-      "path": "README.md",
-      "action": "updated",
+      "path": "tests/old-test.spec.ts",
       "success": true
     }
   ]
 }
 ```
 
-**Example:**
-
-```bash
-curl -X POST http://localhost:9876/upsert \
-  -H "Content-Type: application/json" \
-  -d '{
-    "files": [
-      {
-        "path": "src/hello.ts",
-        "content": "console.log(\"Hello\");"
-      }
-    ]
-  }'
-```
-
 -----
 
-#### 6\. Get Command Output
+#### 7\. Local Git Commit
 
-**GET** `/command-output`
+**POST** `/commit`
 
-Retrieves the result (stdout/stderr) of the last executed command triggered by an upsert operation. Requires `onUpsertCommand` to be set in configuration.
+Execute a local git commit for all changes in the current directory (`git add .` followed by `git commit -m "..."`).
+
+**Request Body:**
+
+```json
+{
+  "basePath": "./",
+  "message": "feat: add new dynamic endpoints for server management"
+}
+```
 
 **Response:**
 
 ```json
 {
-  "timestamp": "2026-02-13T12:30:00.000Z",
-  "command": "npm run build",
-  "output": "Build successful...",
-  "error": null,
-  "success": true
+  "success": true,
+  "output": "[main 4c83b2a] feat: add new dynamic endpoints for server management\n 2 files changed, 45 insertions(+)",
+  "error": null
 }
 ```
 
-OR (if no command was executed):
+-----
 
-```json
-{
-  "status": "no_command_executed"
-}
-```
+#### 8\. Get Command Output
 
-**Example:**
+**GET** `/command-output`
 
-```bash
-curl http://localhost:9876/command-output
-```
+Retrieves the result (stdout/stderr) of the last executed command triggered by an upsert operation. Requires `onUpsertCommand` to be set in configuration.
 
 -----
 

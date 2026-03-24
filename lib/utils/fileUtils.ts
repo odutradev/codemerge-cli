@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, unlinkSync } from 'fs';
 import { dirname } from 'path';
 
 export class FileUtils {
@@ -44,5 +44,11 @@ export class FileUtils {
 
   public static ensureDir(path: string): void {
     if (!existsSync(path)) mkdirSync(path, { recursive: true });
+  }
+
+  public static deleteFile(path: string): boolean {
+    if (!this.exists(path)) return false;
+    unlinkSync(path);
+    return true;
   }
 }
