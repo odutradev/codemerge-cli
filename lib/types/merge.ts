@@ -93,6 +93,7 @@ export interface DeleteFilesResult {
 
 export interface CommitRequest {
   message: string;
+  type: string;
   basePath?: string;
 }
 

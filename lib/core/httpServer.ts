@@ -35,17 +35,17 @@ export class HttpServer {
   };
 
   public start = async (): Promise<void> => {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolveFn, rejectFn) => {
       this.server = createServer(this.handleRequest);
       this.server.on('error', (error: NodeJS.ErrnoException) => {
         if (error.code === 'EADDRINUSE') {
           Logger.error(`Port ${this.port} is already in use`);
-          return reject(error);
+          return rejectFn(error);
         }
         Logger.error(`Server error: ${error.message}`);
-        reject(error);
+        rejectFn(error);
       });
-      this.server.listen(this.port, () => resolve());
+      this.server.listen(this.port, () => resolveFn());
     });
   };
 
@@ -182,26 +182,29 @@ export class HttpServer {
     req.on('end', async () => {
       try {
         const data = JSON.parse(body) as CommitRequest;
-        if (!data.message) {
+        if (!data.type || !data.message) {
           res.writeHead(400, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ success: false, error: 'Commit message is required' }));
+          res.end(JSON.stringify({ success: false, error: 'Commit type and message are required' }));
           return;
         }
 
         const basePath = data.basePath ? resolve(data.basePath) : this.basePath;
+        const cleanType = data.type.replace(/"/g, '\\"');
         const cleanMessage = data.message.replace(/"/g, '\\"');
+        const fullMessage = `${cleanType}: ${cleanMessage}`;
 
         await execAsync('git add .', { cwd: basePath });
-        const { stdout, stderr } = await execAsync(`git commit -m "${cleanMessage}"`, { cwd: basePath });
+        const { stdout, stderr } = await execAsync(`git commit -m "${fullMessage}"`, { cwd: basePath });
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true, output: stdout.trim(), error: stderr ? stderr.trim() : undefined }));
-        Logger.success(`Committed changes: ${cleanMessage}`);
-      } catch (error: any) {
-        const isNoChanges = error.stdout?.includes('nothing to commit') || error.message?.includes('nothing to commit');
+        Logger.success(`Committed changes: ${fullMessage}`);
+      } catch (error: unknown) {
+        const err = error as { stdout?: string; message?: string };
+        const isNoChanges = err.stdout?.includes('nothing to commit') || err.message?.includes('nothing to commit');
         res.writeHead(isNoChanges ? 200 : 500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ success: isNoChanges, output: error.stdout, error: isNoChanges ? 'No changes to commit' : error.message }));
-        if (!isNoChanges) Logger.error(`Git commit failed: ${error.message}`);
+        res.end(JSON.stringify({ success: isNoChanges, output: err.stdout, error: isNoChanges ? 'No changes to commit' : err.message }));
+        if (!isNoChanges) Logger.error(`Git commit failed: ${err.message}`);
       }
     });
   };
