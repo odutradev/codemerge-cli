@@ -1,4 +1,5 @@
 import { spawn } from 'child_process';
+import chalk from 'chalk';
 
 import { Logger } from './logger.js';
 
