@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 
+import { ProcessCmd } from '../utils/proccessCmd.js';
 import { CodeMerger } from '../core/codeMerger.js';
 import { Config } from '../core/config.js';
 import { FileWatcher } from '../core/fileWatcher.js';
@@ -15,7 +16,7 @@ export class UseCommand {
   private async execute(inputPath: string, options: CommandOptions): Promise<void> {
     try {
       Logger.info('Starting code merge...');
-      
+
       const config = Config.load(inputPath);
       const mergeOptions = Config.merge(config, {
         inputPath,
@@ -24,10 +25,14 @@ export class UseCommand {
         ignorePatterns: options.ignore ? options.ignore.split(',') : undefined,
         includePatterns: options.include ? options.include.split(',') : undefined
       });
-      
+
+      if (mergeOptions.onStartCommand) {
+        ProcessCmd.runCommand(mergeOptions.onStartCommand, mergeOptions.onStartCommandLogs);
+      }
+
       const merger = new CodeMerger(mergeOptions);
       const result = await merger.execute();
-      
+
       if (!result.success) {
         Logger.error('Merge failed:');
         result.errors.forEach(error => Logger.error('  ' + error));

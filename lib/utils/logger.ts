@@ -4,6 +4,7 @@ import chalk from 'chalk';
 
 export class Logger {
   private static readonly PREFIX = chalk.redBright('[codemerge]');
+  private static readonly PROJECT_PREFIX = chalk.blueBright('[project-log]');
 
   public static info(message: string): void {
     console.log(`${this.PREFIX} ${chalk.cyan('[info]')} ${message}`);
@@ -19,6 +20,10 @@ export class Logger {
 
   public static warning(message: string): void {
     console.log(`${this.PREFIX} ${chalk.yellowBright('[warn]')} ${chalk.yellow(message)}`);
+  }
+
+  public static project(message: string): void {
+    console.log(`${this.PROJECT_PREFIX} ${message}`);
   }
 
   public static plain(message: string): void {

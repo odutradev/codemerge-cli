@@ -48,7 +48,7 @@ export class InitCommand {
     try {
       const pkg = FileUtils.readJson<{ name?: string }>(packagePath);
       if (!pkg.name) return null;
-      return pkg.name.replace(/^@.*?\//, '');
+      return pkg.name.replace(/^@.*?\
     } catch {
       return null;
     }
@@ -60,17 +60,13 @@ export class InitCommand {
       outputPath,
       port: 9876,
       useGitignore: true,
+      onStartCommand: '',
+      onStartCommandLogs: false,
       onUpsertCommand: '',
       includePatterns: [
-        '**/*.ts',
-        '**/*.tsx',
-        '**/*.js',
-        '**/*.jsx',
-        '**/*.md'
-      ],
-      ignorePatterns: [
-        'node_modules',
-        '**/*.log',
+        '***.tsx',
+        '***.jsx',
+        '***.log',
         'package-lock.json',
         'yarn.lock',
         'pnpm-lock.yaml',

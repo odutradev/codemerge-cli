@@ -1,4 +1,6 @@
 export interface ConfigFile {
+  onStartCommandLogs?: boolean;
+  onStartCommand?: string;
   onUpsertCommand?: string;
   includePatterns?: string[];
   ignorePatterns?: string[];

@@ -69,7 +69,9 @@ export class Config {
       useGitignore: options.useGitignore ?? config.useGitignore ?? true,
       port: options.port ?? config.port ?? this.DEFAULT_PORT,
       writeOutput: options.writeOutput ?? true,
-      onUpsertCommand: config.onUpsertCommand
+      onUpsertCommand: config.onUpsertCommand,
+      onStartCommand: config.onStartCommand,
+      onStartCommandLogs: config.onStartCommandLogs ?? false
     };
   }
 

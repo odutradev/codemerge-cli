@@ -1,6 +1,8 @@
 export interface MergeOptions {
   includePatterns: string[];
   ignorePatterns: string[];
+  onStartCommandLogs?: boolean;
+  onStartCommand?: string;
   onUpsertCommand?: string;
   useGitignore: boolean;
   writeOutput: boolean;
