@@ -3,9 +3,10 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import { resolve } from 'path';
 
+import { translateText } from '../utils/translate.js';
 import { FileUtils } from '../utils/fileUtils.js';
-import { CodeMerger } from './codeMerger.js';
 import { MergeCache } from './mergeCache.js';
+import { CodeMerger } from './codeMerger.js';
 import { Logger } from '../utils/logger.js';
 
 import type { UpsertRequest, UpsertResult, SelectiveContentRequest, MergeOptions, CommandOutput, DeleteFilesRequest, DeleteFilesResult, CommitRequest } from '../types/merge.js';
@@ -190,7 +191,8 @@ export class HttpServer {
 
         const basePath = data.basePath ? resolve(data.basePath) : this.basePath;
         const cleanType = data.type.replace(/"/g, '\\"');
-        const cleanMessage = data.message.replace(/"/g, '\\"');
+        const translatedMessage = data.translate ? await translateText(data.message, 'en') : data.message;
+        const cleanMessage = translatedMessage.replace(/"/g, '\\"');
         const fullMessage = `${cleanType}: ${cleanMessage}`;
 
         await execAsync('git add .', { cwd: basePath });
