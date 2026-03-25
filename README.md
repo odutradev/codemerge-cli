@@ -177,6 +177,7 @@ codemerge watch [path] [options]
   - `POST /upsert` - Create/update files
   - `POST /delete-files` - Delete specific files
   - `POST /commit` - Execute local git commit
+  - `POST /execute-commands` - Execute arbitrary system commands
   - `GET /command-output` - Get output of the last post-upsert command
 
 -----
@@ -382,7 +383,49 @@ Execute a local git commit for all changes in the current directory (`git add .`
 
 -----
 
-#### 8. Get Command Output
+#### 8. Execute Commands
+
+**POST** `/execute-commands`
+
+Execute arbitrary system commands in the project directory.
+
+**Request Body:**
+
+```json
+{
+  "basePath": "./",
+  "commandsToExecute": [
+    "npm run lint",
+    "npm test"
+  ]
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "commandsProcessed": 2,
+  "errors": [],
+  "results": [
+    {
+      "command": "npm run lint",
+      "success": true,
+      "output": "..."
+    },
+    {
+      "command": "npm test",
+      "success": true,
+      "output": "..."
+    }
+  ]
+}
+```
+
+-----
+
+#### 9. Get Command Output
 
 **GET** `/command-output`
 
