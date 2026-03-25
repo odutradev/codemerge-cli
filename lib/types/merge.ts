@@ -105,3 +105,20 @@ export interface CommitResult {
   output?: string;
   error?: string;
 }
+
+export interface ExecuteCommandsRequest {
+  commandsToExecute: string[];
+  basePath?: string;
+}
+
+export interface ExecuteCommandsResult {
+  commandsProcessed: number;
+  success: boolean;
+  errors: string[];
+  results: Array<{
+    success: boolean;
+    command: string;
+    output?: string;
+    error?: string;
+  }>;
+}
