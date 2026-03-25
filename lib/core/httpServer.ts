@@ -3,6 +3,7 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import { resolve } from 'path';
 
+import { translateText } from '../utils/translate.js';
 import { FileUtils } from '../utils/fileUtils.js';
 import { CodeMerger } from './codeMerger.js';
 import { MergeCache } from './mergeCache.js';
@@ -188,9 +189,18 @@ export class HttpServer {
           return;
         }
 
+        let commitMessage = data.message;
+        if (data.translate) {
+          try {
+            commitMessage = await translateText(commitMessage, 'en');
+          } catch {
+            Logger.warning('Translation failed, using original message');
+          }
+        }
+
         const basePath = data.basePath ? resolve(data.basePath) : this.basePath;
         const cleanType = data.type.replace(/"/g, '\\"');
-        const cleanMessage = data.message.replace(/"/g, '\\"');
+        const cleanMessage = commitMessage.replace(/"/g, '\\"');
         const fullMessage = `${cleanType}: ${cleanMessage}`;
 
         await execAsync('git add .', { cwd: basePath });
