@@ -5,13 +5,13 @@
   "license": "MIT",
   "author": "CodeMerge Team",
   "type": "module",
-  "main": "dist/index.js",
+  "main": "dist/cli.js",
   "bin": {
     "codemerge": "bin/codemerge.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/codemerge.git"
+    "url": "git+https://github.com/odutradev/codemerge-cli.git"
   },
   "keywords": [
     "ai",
@@ -48,7 +48,7 @@
     "node": ">=16.0.0"
   },
   "files": [
-    "dist*",
-    "bin*"
+    "dist",
+    "bin"
   ]
 }
