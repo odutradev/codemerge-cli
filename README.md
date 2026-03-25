@@ -27,7 +27,7 @@ CodeMerge is a CLI tool that:
   - **Serves** content via HTTP API for dynamic access
   - **Provides** project structure visualization in JSON
   - **Enables** selective file merging via API
-  - **Executes** system commands upon file updates (Upsert hooks)
+  - **Executes** system commands upon file updates (Upsert hooks) and initialization
   - **Manages** file deletions and local git commits via API
 
 Perfect for:
@@ -56,22 +56,19 @@ npm install --save-dev codemerge-cli
 
 ### Requirements
 
-  - Node.js \>= 16.0.0
+  - Node.js >= 16.0.0
 
 -----
 
 ## 🚀 Quick Start
 
-### 1\. Initialize Project
+### 1. Initialize Project
 
 ```bash
-# Initialize in current directory
 codemerge init
 
-# Initialize in specific directory
 codemerge init ./my-project
 
-# Force overwrite existing config
 codemerge init --force
 ```
 
@@ -80,32 +77,25 @@ This creates:
   - `codemerge.json` - Configuration file
   - Updates `.gitignore` - Adds output file
 
-### 2\. Merge Files
+### 2. Merge Files
 
 ```bash
-# Merge current directory
 codemerge use
 
-# Merge specific directory
 codemerge use ./src
 
-# Custom output file
 codemerge use --output my-code.txt
 
-# Watch for changes
 codemerge use --watch
 ```
 
-### 3\. Start HTTP Server
+### 3. Start HTTP Server
 
 ```bash
-# Start server on default port (9876)
 codemerge watch
 
-# Custom port
 codemerge watch --port 3000
 
-# Custom output and filters
 codemerge watch --output api-code.txt --ignore "*.test.ts"
 ```
 
@@ -136,12 +126,6 @@ codemerge init [path] [options]
   - Adds output file to `.gitignore`
   - Sets up recommended ignore patterns
 
-**Example:**
-
-```bash
-codemerge init ./backend --force
-```
-
 -----
 
 ### `codemerge use`
@@ -163,28 +147,6 @@ codemerge use [path] [options]
   - `--ignore <patterns>` - Additional ignore patterns (comma-separated)
   - `--include <patterns>` - Include patterns (comma-separated)
 
-**Examples:**
-
-```bash
-# Basic merge
-codemerge use
-
-# Merge src folder only
-codemerge use ./src
-
-# Custom output
-codemerge use --output ai-context.txt
-
-# Watch mode
-codemerge use --watch
-
-# Custom filters
-codemerge use --ignore "*.test.ts,*.spec.js" --include "***.js"
-
-# Combine options
-codemerge use ./src --output src-merged.txt --watch
-```
-
 -----
 
 ### `codemerge watch`
@@ -205,22 +167,6 @@ codemerge watch [path] [options]
   - `-p, --port <number>` - Server port (default: `9876`)
   - `--ignore <patterns>` - Additional ignore patterns
   - `--include <patterns>` - Include patterns
-
-**Examples:**
-
-```bash
-# Start server on default port
-codemerge watch
-
-# Custom port
-codemerge watch --port 8080
-
-# Watch specific directory
-codemerge watch ./src --port 3000
-
-# With filters
-codemerge watch --ignore "*.test.ts" --include "***.tsx"
-```
 
 **Server Endpoints:**
 
@@ -265,6 +211,8 @@ codemerge version
   "outputPath": "merged-output.txt",
   "port": 9876,
   "useGitignore": true,
+  "onStartCommand": "npm run dev",
+  "onStartCommandLogs": false,
   "onUpsertCommand": "npm run build",
   "ignorePatterns": [
     "node_modules*.log",
@@ -280,7 +228,10 @@ codemerge version
 }
 ```
 
-**New Option:** `onUpsertCommand` allows defining a shell command to be executed immediately after a successful POST to `/upsert`.
+**Lifecycle Commands:**
+- `onStartCommand`: Command to run automatically when the codemerge server/watcher starts.
+- `onStartCommandLogs`: Boolean flag to display the logs of the start command in the console.
+- `onUpsertCommand`: Shell command to execute immediately after a successful POST to `/upsert`.
 
 ### Default Include Patterns
 
@@ -301,6 +252,7 @@ You can also configure in `package.json`:
   "name": "my-project",
   "codemergeConfig": {
     "outputPath": "ai-digest.txt",
+    "onStartCommand": "npm start",
     "onUpsertCommand": "echo 'Upsert complete'",
     "ignorePatterns": ["***.ts"]
   }
@@ -319,35 +271,15 @@ codemerge watch --port 9876
 
 ### API Endpoints
 
-#### 1\. Health Check
+#### 1. Health Check
 
 **GET** `/health`
 
 Check server status.
 
-**Response:**
-
-```json
-{
-  "status": "ok",
-  "project": "my-project",
-  "endpoints": {
-    "merge": "/content",
-    "structure": "/structure",
-    "selectiveContent": "/selective-content",
-    "upsert": "/upsert",
-    "deleteFiles": "/delete-files",
-    "commit": "/commit",
-    "commandOutput": "/command-output",
-    "health": "/health"
-  },
-  "mergeReady": true
-}
-```
-
 -----
 
-#### 2\. Get Merged Content
+#### 2. Get Merged Content
 
 **GET** `/content`
 
@@ -355,7 +287,7 @@ Get full merged content of all files.
 
 -----
 
-#### 3\. Get Project Structure
+#### 3. Get Project Structure
 
 **GET** `/structure`
 
@@ -363,7 +295,7 @@ Get project structure as JSON tree.
 
 -----
 
-#### 4\. Get Selective Content
+#### 4. Get Selective Content
 
 **POST** `/selective-content`
 
@@ -371,7 +303,7 @@ Merge only selected files/folders.
 
 -----
 
-#### 5\. Upsert Files
+#### 5. Upsert Files
 
 **POST** `/upsert`
 
@@ -379,7 +311,7 @@ Create or update files in the project. If `onUpsertCommand` is configured, it wi
 
 -----
 
-#### 6\. Delete Files
+#### 6. Delete Files
 
 **POST** `/delete-files`
 
@@ -419,20 +351,24 @@ Delete specific files from the project.
 
 -----
 
-#### 7\. Local Git Commit
+#### 7. Local Git Commit
 
 **POST** `/commit`
 
-Execute a local git commit for all changes in the current directory (`git add .` followed by `git commit -m "..."`).
+Execute a local git commit for all changes in the current directory (`git add .` followed by `git commit -m "type: message"`).
 
 **Request Body:**
 
 ```json
 {
   "basePath": "./",
-  "message": "feat: add new dynamic endpoints for server management"
+  "type": "feat",
+  "message": "add new dynamic endpoints for server management",
+  "translate": false
 }
 ```
+
+*Note: The `type` and `message` properties are explicitly required. The `translate` boolean flag is optional.*
 
 **Response:**
 
@@ -446,7 +382,7 @@ Execute a local git commit for all changes in the current directory (`git add .`
 
 -----
 
-#### 8\. Get Command Output
+#### 8. Get Command Output
 
 **GET** `/command-output`
 
@@ -456,38 +392,34 @@ Retrieves the result (stdout/stderr) of the last executed command triggered by a
 
 ## 💡 Use Cases
 
-### 1\. AI Code Analysis
+### 1. AI Code Analysis
 
 Prepare your entire codebase for AI analysis:
 
 ```bash
-# Generate merged file
 codemerge use --output for-ai.txt
 
-# Copy content and paste into ChatGPT/Claude
 cat for-ai.txt | pbcopy  # macOS
 cat for-ai.txt | xclip   # Linux
 ```
 
-### 2\. Code Review Context
+### 2. Code Review Context
 
 Generate context for code reviews:
 
 ```bash
-# Merge only source files
 codemerge use ./src --output review-context.txt --ignore "*.test.ts,*.spec.js"
 ```
 
-### 3\. Documentation Generation
+### 3. Documentation Generation
 
 Create documentation snapshots:
 
 ```bash
-# Include docs and source
 codemerge use --include "***.ts" --output docs-snapshot.txt
 ```
 
-### 4\. AI-Powered Developer Tools
+### 4. AI-Powered Developer Tools
 
 Build tools that need dynamic project access:
 
@@ -502,65 +434,17 @@ const content = await fetch('http://localhost:9876/selective-content', {
 await sendToAI(content);
 ```
 
-### 5\. Continuous Context Updates
+### 5. Continuous Context Updates
 
 Watch mode for real-time updates:
 
 ```bash
-# Terminal 1: Watch and serve
 codemerge watch --port 3000
 
-# Terminal 2: Your app constantly fetches latest
 while true; do
   curl http://localhost:3000/content > latest.txt
   sleep 5
 done
-```
-
-### 6\. Multi-Project Monitoring
-
-Monitor multiple projects:
-
-```bash
-# Project 1
-cd ~/project1 && codemerge watch --port 9001
-
-# Project 2
-cd ~/project2 && codemerge watch --port 9002
-
-# Project 3
-cd ~/project3 && codemerge watch --port 9003
-```
-
------
-
-## 🔧 Advanced Usage
-
-### Custom Patterns
-
-#### Include TypeScript Only
-
-```bash
-codemerge use --include "***.tsx"
-```
-
-#### Exclude Tests and Configs
-
-```bash
-codemerge use --ignore "***.spec.js,***.ts,lib*.ts"
-```
-
-### Combining Options
-
-```bash
-codemerge use \
-  ./backend \
-  --output backend-code.txt \
-  --watch \
-  --ignore "**migrations*.ts,***.ts", "***.test.ts", "***.json,***.min.js"
-
-# Include only specific types
-codemerge use --include "***.png,***.pdf"
 ```
 
 -----
@@ -575,13 +459,13 @@ codemerge use --include "***.png,***.pdf"
 
 ## 📝 License
 
-MIT License - feel free to use in your projects\!
+MIT License - feel free to use in your projects!
 
 -----
 
 ## 🤝 Contributing
 
-Contributions welcome\! Please:
+Contributions welcome! Please:
 
 1.  Fork the repository
 2.  Create a feature branch
