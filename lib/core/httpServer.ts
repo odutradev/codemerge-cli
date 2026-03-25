@@ -14,6 +14,8 @@ import type { UpsertRequest, UpsertResult, SelectiveContentRequest, MergeOptions
 const execAsync = promisify(exec);
 
 export class HttpServer {
+  private commandWaiters: Array<(result: CommandOutput | { status: string }) => void> = [];
+  private isCommandExecuting: boolean = false;
   private commandResult: CommandOutput | null = null;
   private mergeOptions: MergeOptions | null = null;
   private merger: CodeMerger | null = null;
@@ -102,9 +104,10 @@ export class HttpServer {
             results.push({ command, success: true, output: stdout.trim() });
             successCount++;
             Logger.success(`Command executed successfully: ${command}`);
-          } catch (error: any) {
-            const errorMsg = error.message || 'Unknown execution error';
-            results.push({ command, success: false, error: errorMsg, output: error.stdout?.trim() });
+          } catch (error: unknown) {
+            const err = error as Error & { stdout?: string };
+            const errorMsg = err.message || 'Unknown execution error';
+            results.push({ command, success: false, error: errorMsg, output: err.stdout?.trim() });
             errors.push(`${command}: ${errorMsg}`);
             Logger.error(`Command failed: ${command} - ${errorMsg}`);
           }
@@ -323,16 +326,32 @@ export class HttpServer {
     const command = this.mergeOptions?.onUpsertCommand;
     if (!command) return;
 
+    this.isCommandExecuting = true;
     Logger.info(`Executing upsert command: ${command}`);
+
     exec(command, (error, stdout, stderr) => {
       const output = stdout + (stderr ? `\nSTDERR:\n${stderr}` : '');
       const success = !error;
       this.commandResult = { timestamp: new Date().toISOString(), command, output: output.trim(), error: error?.message, success };
+      this.isCommandExecuting = false;
+
       success ? Logger.success(`Command executed successfully`) : Logger.error(`Command execution failed: ${error?.message}`);
+
+      const finalResult = this.commandResult || { status: 'no_command_executed' };
+      this.commandWaiters.forEach(resolve => resolve(finalResult));
+      this.commandWaiters = [];
     });
   };
 
   private handleCommandOutputEndpoint = (res: ServerResponse): void => {
+    if (this.isCommandExecuting) {
+      this.commandWaiters.push((result) => {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(result));
+      });
+      return;
+    }
+
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify(this.commandResult || { status: 'no_command_executed' }));
   };
