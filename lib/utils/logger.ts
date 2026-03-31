@@ -1,4 +1,3 @@
-import Table from 'cli-table';
 import figlet from 'figlet';
 import chalk from 'chalk';
 
@@ -34,9 +33,19 @@ export class Logger {
     console.log(chalk.cyan(figlet.textSync(text)));
   }
 
-  public static table(head: string[], colWidths: number[], data: any[][]): void {
-    const table = new Table({ head, colWidths });
-    data.forEach(item => table.push(item));
-    console.log(table.toString());
+  public static table(head: string[], colWidths: number[], data: unknown[][]): void {
+    const buildSep = (left: string, mid: string, right: string, char: string) => 
+      left + colWidths.map(w => char.repeat(w + 2)).join(mid) + right;
+
+    const buildRow = (row: unknown[]) => 
+      '│ ' + row.map((cell, i) => String(cell).padEnd(colWidths[i] ?? 10)).join(' │ ') + ' │';
+
+    console.log(buildSep('┌', '┬', '┐', '─'));
+    console.log(buildRow(head));
+    console.log(buildSep('├', '┼', '┤', '─'));
+    
+    data.forEach(item => console.log(buildRow(item)));
+    
+    console.log(buildSep('└', '┴', '┘', '─'));
   }
 }
