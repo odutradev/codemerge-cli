@@ -2,11 +2,11 @@ import { exec } from 'child_process'
 import { promisify } from 'util'
 import { resolve } from 'path'
 
-import { translateText } from '@utils/translate.js'
+import Translate from '@utils/translate.js'
 import Logger from '@utils/logger.js'
 
-import type { RequestContext } from '../types.js'
 import type { CommitRequest } from '@type/merge.js'
+import type { RequestContext } from '../types.js'
 
 const execAsync = promisify(exec)
 
@@ -27,7 +27,7 @@ export const handleCommit = ({ req, res, basePath }: RequestContext): void => {
 
       if (data.translate) {
         try {
-          commitMessage = await translateText(commitMessage, 'en')
+          commitMessage = await Translate.text(commitMessage, 'en')
         } catch {
           Logger.warning('Translation failed, using original message')
         }

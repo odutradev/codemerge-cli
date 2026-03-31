@@ -3,11 +3,11 @@ import { createServer, Server, IncomingMessage, ServerResponse } from 'http'
 import CommandService from './services/command.js'
 import CodeMerger from '@core/codeMerger.js'
 import MergeCache from '@core/mergeCache.js'
-import { routeRequest } from './router.js'
 import Logger from '@utils/logger.js'
+import Router from './router.js'
 
-import type { RequestContext } from './types.js'
 import type { MergeOptions } from '@type/merge.js'
+import type { RequestContext } from './types.js'
 
 export default class HttpServer {
   private server: Server | null = null
@@ -65,6 +65,6 @@ export default class HttpServer {
       projectName: this.projectName
     }
 
-    routeRequest(context)
+    Router.handle(context)
   }
 }
