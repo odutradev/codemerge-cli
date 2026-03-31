@@ -63,20 +63,30 @@ export class InitCommand {
       onStartCommand: '',
       onStartCommandLogs: false,
       onUpsertCommand: '',
+      ignorePatterns: [
+        "node_modules/**",
+        ".git/**",
+        "dist/**",
+        "build/**",
+        "**/*.log",
+        ".env*",
+        "**/.DS_Store",
+        "coverage/**",
+        ".next/**",
+        ".nuxt/**"
+      ],
       includePatterns: [
-        '***.tsx',
-        '***.jsx',
-        '***.log',
-        'package-lock.json',
-        'yarn.lock',
-        'pnpm-lock.yaml',
-        'codemerge.json',
-        'merged-output.txt',
-        '.env',
-        '.env.*',
-        '**/.DS_Store',
-        'coverage'
-      ]
+        "Dockerfile",
+        "LICENSE",
+        "**/*.ts",
+        "**/*.py",
+        "**/*.js",
+        "**/*.tsx",
+        "**/*.jsx",
+        "**/*.json",
+        "**/*.html",
+        "**/*.md",
+      ],
     };
     FileUtils.write(configPath, JSON.stringify(config, null, 2) + '\n');
   };
