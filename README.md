@@ -1,200 +1,201 @@
 # CodeMerge CLI
 
-AI-focused code and data preparation utility. Merge multiple files into a single output optimized for AI context windows, with HTTP API for dynamic content generation.
+Utilitário de preparação de código e dados focado em IA. Mescla múltiplos arquivos em uma única saída otimizada para janelas de contexto de IA, com API HTTP para geração dinâmica de conteúdo.
 
-## 📋 Table of Contents
+## 📋 Índice
 
-  - [Overview](https://www.google.com/search?q=%23overview)
-  - [Installation](https://www.google.com/search?q=%23installation)
-  - [Quick Start](https://www.google.com/search?q=%23quick-start)
-  - [Commands](https://www.google.com/search?q=%23commands)
-  - [Configuration](https://www.google.com/search?q=%23configuration)
-  - [HTTP Server & API](https://www.google.com/search?q=%23http-server--api)
-  - [Use Cases](https://www.google.com/search?q=%23use-cases)
-  - [Advanced Usage](https://www.google.com/search?q=%23advanced-usage)
-  - [Troubleshooting](https://www.google.com/search?q=%23troubleshooting)
-
------
-
-## 🎯 Overview
-
-CodeMerge is a CLI tool that:
-
-  - **Merges** multiple code files into a single, structured text file
-  - **Optimizes** output for AI tools (ChatGPT, Claude, etc.)
-  - **Respects** .gitignore patterns and custom ignore rules
-  - **Watches** for file changes and auto-regenerates
-  - **Serves** content via HTTP API for dynamic access
-  - **Provides** project structure visualization in JSON
-  - **Enables** selective file merging via API
-  - **Executes** system commands upon file updates (Upsert hooks) and initialization
-  - **Manages** file deletions and local git commits via API
-
-Perfect for:
-
-  - Preparing codebases for AI analysis
-  - Generating context for code reviews
-  - Creating documentation snapshots
-  - Sharing project structure with AI assistants
-  - Building AI-powered developer tools
+  - [Visão Geral](https://www.google.com/search?q=%23-vis%C3%A3o-geral)
+  - [Instalação](https://www.google.com/search?q=%23-instala%C3%A7%C3%A3o)
+  - [Início Rápido](https://www.google.com/search?q=%23-in%C3%ADcio-r%C3%A1pido)
+  - [Comandos](https://www.google.com/search?q=%23-comandos)
+  - [Configuração](https://www.google.com/search?q=%23%EF%B8%8F-configura%C3%A7%C3%A3o)
+  - [Servidor HTTP & API](https://www.google.com/search?q=%23-servidor-http--api)
+  - [Casos de Uso](https://www.google.com/search?q=%23-casos-de-uso)
+  - [Recursos Adicionais](https://www.google.com/search?q=%23-recursos-adicionais)
+  - [Licença](https://www.google.com/search?q=%23-licen%C3%A7a)
+  - [Contribuindo](https://www.google.com/search?q=%23-contribuindo)
 
 -----
 
-## 📦 Installation
+## 🎯 Visão Geral
 
-### Global Installation (Recommended)
+CodeMerge é uma ferramenta de linha de comando (CLI) que:
+
+  - **Mescla** múltiplos arquivos de código em um único arquivo de texto estruturado
+  - **Otimiza** a saída para ferramentas de IA (ChatGPT, Claude, etc.)
+  - **Respeita** os padrões do `.gitignore` e regras de ignorar personalizadas
+  - **Observa** alterações de arquivos e os regenera automaticamente
+  - **Serve** conteúdo via API HTTP para acesso dinâmico
+  - **Fornece** visualização da estrutura do projeto em JSON
+  - **Permite** a mesclagem seletiva de arquivos via API
+  - **Executa** comandos do sistema após atualizações de arquivos (hooks de Upsert) e na inicialização
+  - **Gerencia** exclusões de arquivos e commits locais do git via API
+
+Perfeito para:
+
+  - Preparar bases de código para análise de IA
+  - Gerar contexto para revisões de código
+  - Criar snapshots de documentação
+  - Compartilhar a estrutura do projeto com assistentes de IA
+  - Construir ferramentas de desenvolvedor alimentadas por IA
+
+-----
+
+## 📦 Instalação
+
+### Instalação Global (Recomendada)
 
 ```bash
 npm install -g codemerge-cli
 ```
 
-### Local Project Installation
+### Instalação Local no Projeto
 
 ```bash
 npm install --save-dev codemerge-cli
 ```
 
-### Requirements
+### Requisitos
 
-  - Node.js >= 16.0.0
+  - Node.js \>= 16.0.0
 
 -----
 
-## 🚀 Quick Start
+## 🚀 Início Rápido
 
-### 1. Initialize Project
+### 1\. Inicializar o Projeto
 
 ```bash
 codemerge init
 
-codemerge init ./my-project
+codemerge init ./meu-projeto
 
 codemerge init --force
 ```
 
-This creates:
+Isso cria:
 
-  - `codemerge.json` - Configuration file
-  - Updates `.gitignore` - Adds output file
+  - `codemerge.json` - Arquivo de configuração
+  - Atualiza o `.gitignore` - Adiciona o arquivo de saída
 
-### 2. Merge Files
+### 2\. Mesclar Arquivos
 
 ```bash
 codemerge use
 
 codemerge use ./src
 
-codemerge use --output my-code.txt
+codemerge use --output meu-codigo.txt
 
 codemerge use --watch
 ```
 
-### 3. Start HTTP Server
+### 3\. Iniciar Servidor HTTP
 
 ```bash
 codemerge watch
 
 codemerge watch --port 3000
 
-codemerge watch --output api-code.txt --ignore "*.test.ts"
+codemerge watch --output api-codigo.txt --ignore "*.test.ts"
 ```
 
 -----
 
-## 🎮 Commands
+## 🎮 Comandos
 
 ### `codemerge init`
 
-Initialize CodeMerge in a project.
+Inicializa o CodeMerge em um projeto.
 
 ```bash
-codemerge init [path] [options]
+codemerge init [caminho] [opções]
 ```
 
-**Arguments:**
+**Argumentos:**
 
-  - `path` - Target directory (default: `.`)
+  - `caminho` - Diretório de destino (padrão: `.`)
 
-**Options:**
+**Opções:**
 
-  - `-f, --force` - Overwrite existing configuration
+  - `-f, --force` - Sobrescrever a configuração existente
 
-**What it does:**
+**O que faz:**
 
-  - Creates `codemerge.json` with default settings
-  - Detects project name from `package.json`
-  - Adds output file to `.gitignore`
-  - Sets up recommended ignore patterns
+  - Cria o `codemerge.json` com configurações padrão
+  - Detecta o nome do projeto a partir do `package.json`
+  - Adiciona o arquivo de saída ao `.gitignore`
+  - Configura padrões recomendados de ignorar
 
 -----
 
 ### `codemerge use`
 
-Merge code files into a single output.
+Mescla os arquivos de código em uma única saída.
 
 ```bash
-codemerge use [path] [options]
+codemerge use [caminho] [opções]
 ```
 
-**Arguments:**
+**Argumentos:**
 
-  - `path` - Input directory to scan (default: `.`)
+  - `caminho` - Diretório de entrada para verificar (padrão: `.`)
 
-**Options:**
+**Opções:**
 
-  - `-o, --output <path>` - Custom output file path
-  - `-w, --watch` - Watch for file changes
-  - `--ignore <patterns>` - Additional ignore patterns (comma-separated)
-  - `--include <patterns>` - Include patterns (comma-separated)
+  - `-o, --output <caminho>` - Caminho de arquivo de saída personalizado
+  - `-w, --watch` - Observar alterações de arquivos
+  - `--ignore <padroes>` - Padrões adicionais para ignorar (separados por vírgula)
+  - `--include <padroes>` - Padrões de inclusão (separados por vírgula)
 
 -----
 
 ### `codemerge watch`
 
-Start HTTP server with file watching.
+Inicia o servidor HTTP observando os arquivos.
 
 ```bash
-codemerge watch [path] [options]
+codemerge watch [caminho] [opções]
 ```
 
-**Arguments:**
+**Argumentos:**
 
-  - `path` - Input directory to scan (default: `.`)
+  - `caminho` - Diretório de entrada para verificar (padrão: `.`)
 
-**Options:**
+**Opções:**
 
-  - `-o, --output <path>` - Output file path
-  - `-p, --port <number>` - Server port (default: `9876`)
-  - `--ignore <patterns>` - Additional ignore patterns
-  - `--include <patterns>` - Include patterns
+  - `-o, --output <caminho>` - Caminho do arquivo de saída
+  - `-p, --port <numero>` - Porta do servidor (padrão: `9876`)
+  - `--ignore <padroes>` - Padrões adicionais para ignorar
+  - `--include <padroes>` - Padrões de inclusão
 
-**Server Endpoints:**
+**Endpoints do Servidor:**
 
-  - `GET /health` - Server health status
-  - `GET /content` - Full merged content
-  - `GET /structure` - Project structure JSON
-  - `POST /selective-content` - Merge selected files
-  - `POST /upsert` - Create/update files
-  - `POST /delete-files` - Delete specific files
-  - `POST /commit` - Execute local git commit
-  - `POST /execute-commands` - Execute arbitrary system commands
-  - `GET /command-output` - Get output of the last post-upsert command
+  - `GET /health` - Status de integridade do servidor
+  - `GET /content` - Conteúdo completo mesclado
+  - `GET /structure` - Estrutura do projeto em JSON
+  - `POST /selective-content` - Mesclar arquivos selecionados
+  - `POST /upsert` - Criar/atualizar arquivos
+  - `POST /delete-files` - Excluir arquivos específicos
+  - `POST /commit` - Executar commit local do git
+  - `POST /execute-commands` - Executar comandos arbitrários do sistema
+  - `GET /command-output` - Obter saída do último comando pós-upsert executado
 
 -----
 
 ### `codemerge help`
 
-Display help information.
+Exibe informações de ajuda.
 
 ```bash
-codemerge help [command]
+codemerge help [comando]
 ```
 
 -----
 
 ### `codemerge version`
 
-Display version information.
+Exibe informações da versão.
 
 ```bash
 codemerge version
@@ -202,13 +203,13 @@ codemerge version
 
 -----
 
-## ⚙️ Configuration
+## ⚙️ Configuração
 
-### Configuration File: `codemerge.json`
+### Arquivo de Configuração: `codemerge.json`
 
 ```json
 {
-  "projectName": "my-project",
+  "projectName": "meu-projeto",
   "outputPath": "merged-output.txt",
   "port": 9876,
   "useGitignore": true,
@@ -229,12 +230,13 @@ codemerge version
 }
 ```
 
-**Lifecycle Commands:**
-- `onStartCommand`: Command to run automatically when the codemerge server/watcher starts.
-- `onStartCommandLogs`: Boolean flag to display the logs of the start command in the console.
-- `onUpsertCommand`: Shell command to execute immediately after a successful POST to `/upsert`.
+**Comandos de Ciclo de Vida:**
 
-### Default Include Patterns
+  - `onStartCommand`: Comando para executar automaticamente quando o servidor/observador do codemerge iniciar.
+  - `onStartCommandLogs`: Flag booleana para exibir os logs do comando de inicialização no console.
+  - `onUpsertCommand`: Comando shell para executar imediatamente após um POST bem-sucedido em `/upsert`.
+
+### Padrões de Inclusão Padrão
 
 ```javascript
 [
@@ -244,17 +246,17 @@ codemerge version
 ]
 ```
 
-### Alternative: package.json Configuration
+### Alternativa: Configuração via `package.json`
 
-You can also configure in `package.json`:
+Você também pode configurar no `package.json`:
 
 ```json
 {
-  "name": "my-project",
+  "name": "meu-projeto",
   "codemergeConfig": {
     "outputPath": "ai-digest.txt",
     "onStartCommand": "npm start",
-    "onUpsertCommand": "echo 'Upsert complete'",
+    "onUpsertCommand": "echo 'Upsert concluído'",
     "ignorePatterns": ["***.ts"]
   }
 }
@@ -262,75 +264,75 @@ You can also configure in `package.json`:
 
 -----
 
-## 🌐 HTTP Server & API
+## 🌐 Servidor HTTP & API
 
-### Starting the Server
+### Iniciando o Servidor
 
 ```bash
 codemerge watch --port 9876
 ```
 
-### API Endpoints
+### Endpoints da API
 
-#### 1. Health Check
+#### 1\. Verificação de Integridade (Health Check)
 
 **GET** `/health`
 
-Check server status.
+Verifica o status do servidor.
 
 -----
 
-#### 2. Get Merged Content
+#### 2\. Obter Conteúdo Mesclado
 
 **GET** `/content`
 
-Get full merged content of all files.
+Obtém o conteúdo completo mesclado de todos os arquivos.
 
 -----
 
-#### 3. Get Project Structure
+#### 3\. Obter Estrutura do Projeto
 
 **GET** `/structure`
 
-Get project structure as JSON tree.
+Obtém a estrutura do projeto como uma árvore JSON.
 
 -----
 
-#### 4. Get Selective Content
+#### 4\. Obter Conteúdo Seletivo
 
 **POST** `/selective-content`
 
-Merge only selected files/folders.
+Mescla apenas arquivos/pastas selecionados.
 
 -----
 
-#### 5. Upsert Files
+#### 5\. Inserir/Atualizar Arquivos (Upsert)
 
 **POST** `/upsert`
 
-Create or update files in the project. If `onUpsertCommand` is configured, it will be executed after a successful upsert.
+Cria ou atualiza arquivos no projeto. Se `onUpsertCommand` estiver configurado, ele será executado após um upsert bem-sucedido.
 
 -----
 
-#### 6. Delete Files
+#### 6\. Excluir Arquivos
 
 **POST** `/delete-files`
 
-Delete specific files from the project.
+Exclui arquivos específicos do projeto.
 
-**Request Body:**
+**Corpo da Requisição:**
 
 ```json
 {
   "basePath": "./",
   "files": [
-    "src/obsolete-file.ts",
-    "tests/old-test.spec.ts"
+    "src/arquivo-obsoleto.ts",
+    "tests/teste-antigo.spec.ts"
   ]
 }
 ```
 
-**Response:**
+**Resposta:**
 
 ```json
 {
@@ -339,11 +341,11 @@ Delete specific files from the project.
   "errors": [],
   "results": [
     {
-      "path": "src/obsolete-file.ts",
+      "path": "src/arquivo-obsoleto.ts",
       "success": true
     },
     {
-      "path": "tests/old-test.spec.ts",
+      "path": "tests/teste-antigo.spec.ts",
       "success": true
     }
   ]
@@ -352,44 +354,44 @@ Delete specific files from the project.
 
 -----
 
-#### 7. Local Git Commit
+#### 7\. Commit Local do Git
 
 **POST** `/commit`
 
-Execute a local git commit for all changes in the current directory (`git add .` followed by `git commit -m "type: message"`).
+Executa um commit local do git para todas as alterações no diretório atual (`git add .` seguido de `git commit -m "tipo: mensagem"`).
 
-**Request Body:**
+**Corpo da Requisição:**
 
 ```json
 {
   "basePath": "./",
   "type": "feat",
-  "message": "add new dynamic endpoints for server management",
+  "message": "adiciona novos endpoints dinâmicos para gerenciamento do servidor",
   "translate": false
 }
 ```
 
-*Note: The `type` and `message` properties are explicitly required. The `translate` boolean flag is optional.*
+*Nota: As propriedades `type` e `message` são explicitamente obrigatórias. A flag booleana `translate` é opcional.*
 
-**Response:**
+**Resposta:**
 
 ```json
 {
   "success": true,
-  "output": "[main 4c83b2a] feat: add new dynamic endpoints for server management\n 2 files changed, 45 insertions(+)",
+  "output": "[main 4c83b2a] feat: adiciona novos endpoints dinâmicos para gerenciamento do servidor\n 2 files changed, 45 insertions(+)",
   "error": null
 }
 ```
 
 -----
 
-#### 8. Execute Commands
+#### 8\. Executar Comandos
 
 **POST** `/execute-commands`
 
-Execute arbitrary system commands in the project directory.
+Executa comandos arbitrários do sistema no diretório do projeto.
 
-**Request Body:**
+**Corpo da Requisição:**
 
 ```json
 {
@@ -401,7 +403,7 @@ Execute arbitrary system commands in the project directory.
 }
 ```
 
-**Response:**
+**Resposta:**
 
 ```json
 {
@@ -425,46 +427,46 @@ Execute arbitrary system commands in the project directory.
 
 -----
 
-#### 9. Get Command Output
+#### 9\. Obter Saída de Comando
 
 **GET** `/command-output`
 
-Retrieves the result (stdout/stderr) of the last executed command triggered by an upsert operation. Requires `onUpsertCommand` to be set in configuration.
+Recupera o resultado (stdout/stderr) do último comando executado, acionado por uma operação de upsert. Requer que `onUpsertCommand` esteja definido na configuração.
 
 -----
 
-## 💡 Use Cases
+## 💡 Casos de Uso
 
-### 1. AI Code Analysis
+### 1\. Análise de Código por IA
 
-Prepare your entire codebase for AI analysis:
-
-```bash
-codemerge use --output for-ai.txt
-
-cat for-ai.txt | pbcopy  # macOS
-cat for-ai.txt | xclip   # Linux
-```
-
-### 2. Code Review Context
-
-Generate context for code reviews:
+Prepare toda a sua base de código para análise de IA:
 
 ```bash
-codemerge use ./src --output review-context.txt --ignore "*.test.ts,*.spec.js"
+codemerge use --output para-ia.txt
+
+cat para-ia.txt | pbcopy  # macOS
+cat para-ia.txt | xclip   # Linux
 ```
 
-### 3. Documentation Generation
+### 2\. Contexto para Revisão de Código
 
-Create documentation snapshots:
+Gere contexto para revisões de código:
 
 ```bash
-codemerge use --include "***.ts" --output docs-snapshot.txt
+codemerge use ./src --output contexto-revisao.txt --ignore "*.test.ts,*.spec.js"
 ```
 
-### 4. AI-Powered Developer Tools
+### 3\. Geração de Documentação
 
-Build tools that need dynamic project access:
+Crie snapshots da documentação:
+
+```bash
+codemerge use --include "***.ts" --output snapshot-docs.txt
+```
+
+### 4\. Ferramentas de Desenvolvedor Baseadas em IA
+
+Construa ferramentas que precisem de acesso dinâmico ao projeto:
 
 ```javascript
 const structure = await fetch('http://localhost:9876/structure').then(r => r.json());
@@ -477,40 +479,40 @@ const content = await fetch('http://localhost:9876/selective-content', {
 await sendToAI(content);
 ```
 
-### 5. Continuous Context Updates
+### 5\. Atualizações Contínuas de Contexto
 
-Watch mode for real-time updates:
+Modo de observação para atualizações em tempo real:
 
 ```bash
 codemerge watch --port 3000
 
 while true; do
-  curl http://localhost:3000/content > latest.txt
+  curl http://localhost:3000/content > mais-recente.txt
   sleep 5
 done
 ```
 
 -----
 
-## 📚 Additional Resources
+## 📚 Recursos Adicionais
 
   - **GitHub:** [github.com/odutradev/codemerge-cli](https://github.com/odutradev/codemerge-cli)
-  - **Issues:** [Report bugs](https://github.com/odutradev/codemerge-cli/issues)
+  - **Issues:** [Reportar bugs](https://github.com/odutradev/codemerge-cli/issues)
   - **NPM:** [npmjs.com/package/codemerge-cli](https://www.npmjs.com/package/codemerge-cli)
 
 -----
 
-## 📝 License
+## 📝 Licença
 
-MIT License - feel free to use in your projects!
+Licença MIT - sinta-se à vontade para usar em seus projetos\!
 
 -----
 
-## 🤝 Contributing
+## 🤝 Contribuindo
 
-Contributions welcome! Please:
+Contribuições são bem-vindas\! Por favor:
 
-1.  Fork the repository
-2.  Create a feature branch
-3.  Make your changes
-4.  Submit a pull request
+1.  Faça um fork do repositório
+2.  Crie uma branch de funcionalidade
+3.  Faça suas alterações
+4.  Envie um pull request
