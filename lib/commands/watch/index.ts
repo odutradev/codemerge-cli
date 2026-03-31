@@ -1,8 +1,8 @@
 import { basename, resolve } from 'path'
 import { Command } from 'commander'
 
+import { HttpServer } from '../../core/httpServer/index.js'
 import { FileWatcher } from '../../core/fileWatcher.js'
-import { HttpServer } from '../../core/httpServer.js'
 import { CodeMerger } from '../../core/codeMerger.js'
 import { MergeCache } from '../../core/mergeCache.js'
 import { Process } from '../../utils/process.js'
@@ -49,10 +49,12 @@ export class WatchCommand {
       await this.performInitialMerge(merger, cache)
       
       const server = new HttpServer(port, projectName, cache, basePath)
+      
       server.setMerger(merger, mergeOptions)
       await server.start()
       
       const watcher = new FileWatcher(mergeOptions, async () => await this.performInitialMerge(merger, cache))
+      
       watcher.start()
       
       this.setupGracefulShutdown(server, watcher)
@@ -75,11 +77,13 @@ export class WatchCommand {
 
   private performInitialMerge = async (merger: CodeMerger, cache: MergeCache): Promise<void> => {
     const result = await merger.execute()
+    
     if (!result.success) {
       Logger.error('Initial merge failed')
       result.errors.forEach(error => Logger.error(`  ${error}`))
       return
     }
+    
     if (result.content) cache.set(result.content)
     Logger.success(`Merged ${result.filesProcessed} files`)
   }
@@ -93,6 +97,7 @@ export class WatchCommand {
       watcher.stop()
       process.exit(0)
     }
+    
     process.on('SIGINT', shutdown)
     process.on('SIGTERM', shutdown)
   }
