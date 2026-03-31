@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 import { fileURLToPath, pathToFileURL } from 'url'
 import { readFileSync, readdirSync } from 'fs'
-import { dirname, join } from 'path'
 import { Command } from 'commander'
+import { dirname, join } from 'path'
 
-import { Logger } from '@utils/logger.js'
+import Logger from '@utils/logger.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -41,7 +41,7 @@ class CLI {
       const filePath = join(commandsPath, fileName)
       const fileUrl = pathToFileURL(filePath).href
       const module = await import(fileUrl)
-      const CommandClass = module[Object.keys(module).find(key => key.includes('Command')) || ''] as CommandClass
+      const CommandClass = module.default as CommandClass
 
       if (!CommandClass) {
         Logger.warning(`Skipping ${fileName}: No command class found`)

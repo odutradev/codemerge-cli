@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync, unlinkSync, readdirSync, rmdirSync } from 'fs'
 import { dirname } from 'path'
 
-export class File {
+export default class File {
   private static readonly BINARY_EXTENSIONS = [
     '.png', '.jpg', '.jpeg', '.gif', '.ico', '.bmp', '.svg',
     '.pdf', '.zip', '.tar', '.gz', '.rar', '.7z',

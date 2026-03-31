@@ -1,16 +1,16 @@
-import { readFileSync } from 'fs'
 import { Command } from 'commander'
+import { readFileSync } from 'fs'
 import { join } from 'path'
 
 import { DEFAULT_CONFIG } from '@core/defaults.js'
-import { Logger } from '@utils/logger.js'
-import { Path } from '@utils/path.js'
-import { File } from '@utils/file.js'
+import Logger from '@utils/logger.js'
+import File from '@utils/file.js'
+import Path from '@utils/path.js'
 
-import type { ConfigFile } from '@type/config.js'
 import type { InitOptions } from './types.js'
+import type { ConfigFile } from '@type/config.js'
 
-export class InitCommand {
+export default class InitCommand {
   public register = (program: Command): void => {
     program
       .command('init')

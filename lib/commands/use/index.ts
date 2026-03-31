@@ -1,14 +1,14 @@
 import { Command } from 'commander'
 
-import { FileWatcher } from '@core/fileWatcher.js'
-import { CodeMerger } from '@core/codeMerger.js'
-import { Process } from '@utils/process.js'
-import { Logger } from '@utils/logger.js'
-import { Config } from '@core/config.js'
+import FileWatcher from '@core/fileWatcher.js'
+import CodeMerger from '@core/codeMerger.js'
+import Process from '@utils/process.js'
+import Config from '@core/config.js'
+import Logger from '@utils/logger.js'
 
 import type { UseOptions } from './types.js'
 
-export class UseCommand {
+export default class UseCommand {
   public register = (program: Command): void => {
     program
       .command('use')

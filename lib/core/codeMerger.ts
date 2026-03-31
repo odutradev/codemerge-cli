@@ -1,12 +1,12 @@
 import { resolve, relative, basename, join } from 'path'
 import { promises } from 'fs'
 
-import { Pattern } from '@utils/pattern.js'
-import { File } from '@utils/file.js'
+import Pattern from '@utils/pattern.js'
+import File from '@utils/file.js'
 
 import type { ProjectStructure, ProjectNode, MergeOptions, MergeResult, FileData } from '@type/merge.js'
 
-export class CodeMerger {
+export default class CodeMerger {
   private options: MergeOptions
 
   constructor(options: MergeOptions) {

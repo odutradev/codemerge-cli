@@ -1,12 +1,12 @@
+import { exec } from 'child_process'
 import { promisify } from 'util'
 import { resolve } from 'path'
-import { exec } from 'child_process'
 
 import { translateText } from '@utils/translate.js'
-import { Logger } from '@utils/logger.js'
+import Logger from '@utils/logger.js'
 
-import type { CommitRequest } from '@type/merge.js'
 import type { RequestContext } from '../types.js'
+import type { CommitRequest } from '@type/merge.js'
 
 const execAsync = promisify(exec)
 

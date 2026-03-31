@@ -1,8 +1,8 @@
 import { spawn } from 'child_process'
 
-import { Logger } from './logger.js'
+import Logger from './logger.js'
 
-export class Process {
+export default class Process {
   public static runCommand = (command: string, showLogs: boolean = false): void => {
     if (!command) return
     

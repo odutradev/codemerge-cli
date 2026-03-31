@@ -10,7 +10,7 @@ const white = (t: string) => format('37', t)
 const cyan = (t: string) => format('36', t)
 const red = (t: string) => format('31', t)
 
-export class Logger {
+export default class Logger {
   private static readonly PROJECT_PREFIX = blueBright('[project-log]')
   private static readonly PREFIX = redBright('[codemerge]')
 

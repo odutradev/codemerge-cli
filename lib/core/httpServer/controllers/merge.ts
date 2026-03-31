@@ -1,4 +1,4 @@
-import { Logger } from '@utils/logger.js'
+import Logger from '@utils/logger.js'
 
 import type { SelectiveContentRequest } from '@type/merge.js'
 import type { RequestContext } from '../types.js'

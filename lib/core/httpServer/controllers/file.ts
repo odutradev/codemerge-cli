@@ -1,7 +1,7 @@
 import { resolve, dirname } from 'path'
 
-import { Logger } from '@utils/logger.js'
-import { File } from '@utils/file.js'
+import Logger from '@utils/logger.js'
+import File from '@utils/file.js'
 
 import type { UpsertRequest, UpsertResult, DeleteFilesRequest, DeleteFilesResult } from '@type/merge.js'
 import type { RequestContext } from '../types.js'

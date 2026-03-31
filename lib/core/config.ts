@@ -1,13 +1,13 @@
 import { join } from 'path'
 
 import { DEFAULT_CONFIG, DEFAULT_IGNORE_PATTERNS, DEFAULT_INCLUDE_PATTERNS } from './defaults.js'
-import { Path } from '@utils/path.js'
-import { File } from '@utils/file.js'
+import Path from '@utils/path.js'
+import File from '@utils/file.js'
 
-import type { ConfigFile } from '@type/config.js'
 import type { MergeOptions } from '@type/merge.js'
+import type { ConfigFile } from '@type/config.js'
 
-export class Config {
+export default class Config {
   private static readonly CONFIG_FILENAMES = ['codemerge.json', 'codemerge.config.json']
 
   public static load = (basePath: string): ConfigFile => {

@@ -1,4 +1,4 @@
-export class Pattern {
+export default class Pattern {
   public static parseGitignorePatterns = (content: string): string[] => {
     const patterns: string[] = []
     

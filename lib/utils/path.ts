@@ -1,7 +1,7 @@
 import { resolve, relative, normalize, join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 
-export class Path {
+export default class Path {
   public static resolve = (path: string): string => resolve(path)
 
   public static relative = (from: string, to: string): string => relative(from, to)

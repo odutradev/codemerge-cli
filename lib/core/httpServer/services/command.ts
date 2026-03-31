@@ -1,10 +1,10 @@
 import { exec } from 'child_process'
 
-import { Logger } from '@utils/logger.js'
+import Logger from '@utils/logger.js'
 
 import type { CommandOutput } from '@type/merge.js'
 
-export class CommandService {
+export default class CommandService {
   private waiters: Array<(result: CommandOutput | { status: string }) => void> = []
   private result: CommandOutput | null = null
   private isExecuting: boolean = false
@@ -22,7 +22,11 @@ export class CommandService {
       this.result = { timestamp: new Date().toISOString(), command, output: output.trim(), error: error?.message, success }
       this.isExecuting = false
 
-      success ? Logger.success(`Command executed successfully`) : Logger.error(`Command execution failed: ${error?.message}`)
+      if (success) {
+        Logger.success(`Command executed successfully`)
+      } else {
+        Logger.error(`Command execution failed: ${error?.message}`)
+      }
 
       const finalResult = this.result || { status: 'no_command_executed' }
       this.waiters.forEach(resolve => resolve(finalResult))
