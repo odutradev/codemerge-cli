@@ -6,6 +6,7 @@ const redBright = (t: string) => format('91', t)
 const cyanBold = (t: string) => format('1;36', t)
 const yellow = (t: string) => format('33', t)
 const green = (t: string) => format('32', t)
+const white = (t: string) => format('37', t)
 const cyan = (t: string) => format('36', t)
 const red = (t: string) => format('31', t)
 
@@ -30,11 +31,11 @@ export class Logger {
   }
 
   public static project(message: string): void {
-    console.log(`${this.PROJECT_PREFIX} ${message}`)
+    console.log(`${this.PROJECT_PREFIX} ${white(message)}`)
   }
 
   public static projectError(message: string): void {
-    console.log(`${this.PROJECT_PREFIX} ${red(message)}`)
+    console.log(`${this.PROJECT_PREFIX} ${white(message)}`)
   }
 
   public static plain(message: string): void {

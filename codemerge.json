@@ -4,7 +4,7 @@
   "port": 9876,
   "useGitignore": true,
   "onUpsertCommand":"npm run build",
-  "onStartCommand": "",
+  "onStartCommand": "npm run dev",
   "onStartCommandLogs": true,
   "ignorePatterns": [
     "node_modules/**",
