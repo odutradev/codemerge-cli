@@ -2,16 +2,13 @@ import { readFileSync } from 'fs'
 import { Command } from 'commander'
 import { join } from 'path'
 
-import { DEFAULT_CONFIG } from '../core/defaults.js'
-import { Logger } from '../utils/logger.js'
-import { Path } from '../utils/path.js'
-import { File } from '../utils/file.js'
+import { DEFAULT_CONFIG } from '../../core/defaults.js'
+import { Logger } from '../../utils/logger.js'
+import { Path } from '../../utils/path.js'
+import { File } from '../../utils/file.js'
 
-import type { ConfigFile } from '../types/config.js'
-
-interface InitOptions {
-  force?: boolean
-}
+import type { ConfigFile } from '../../types/config.js'
+import type { InitOptions } from './types.js'
 
 export class InitCommand {
   public register = (program: Command): void => {

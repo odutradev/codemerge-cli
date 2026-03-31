@@ -1,15 +1,15 @@
 import { basename, resolve } from 'path'
 import { Command } from 'commander'
 
-import { HttpServer } from '../core/httpServer.js'
-import { FileWatcher } from '../core/fileWatcher.js'
-import { CodeMerger } from '../core/codeMerger.js'
-import { MergeCache } from '../core/mergeCache.js'
-import { Process } from '../utils/process.js'
-import { Logger } from '../utils/logger.js'
-import { Config } from '../core/config.js'
+import { FileWatcher } from '../../core/fileWatcher.js'
+import { HttpServer } from '../../core/httpServer.js'
+import { CodeMerger } from '../../core/codeMerger.js'
+import { MergeCache } from '../../core/mergeCache.js'
+import { Process } from '../../utils/process.js'
+import { Logger } from '../../utils/logger.js'
+import { Config } from '../../core/config.js'
 
-import type { CommandOptions } from '../types/config.js'
+import type { WatchOptions } from './types.js'
 
 export class WatchCommand {
   public register = (program: Command): void => {
@@ -24,7 +24,7 @@ export class WatchCommand {
       .action(this.execute)
   }
 
-  private execute = async (inputPath: string, options: CommandOptions & { port?: string }): Promise<void> => {
+  private execute = async (inputPath: string, options: WatchOptions): Promise<void> => {
     try {
       Logger.info('Starting watch mode...')
       

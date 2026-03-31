@@ -1,12 +1,12 @@
 import { Command } from 'commander'
 
-import { FileWatcher } from '../core/fileWatcher.js'
-import { CodeMerger } from '../core/codeMerger.js'
-import { Process } from '../utils/process.js'
-import { Logger } from '../utils/logger.js'
-import { Config } from '../core/config.js'
+import { FileWatcher } from '../../core/fileWatcher.js'
+import { CodeMerger } from '../../core/codeMerger.js'
+import { Process } from '../../utils/process.js'
+import { Logger } from '../../utils/logger.js'
+import { Config } from '../../core/config.js'
 
-import type { CommandOptions } from '../types/config.js'
+import type { UseOptions } from './types.js'
 
 export class UseCommand {
   public register = (program: Command): void => {
@@ -21,7 +21,7 @@ export class UseCommand {
       .action(this.execute)
   }
 
-  private execute = async (inputPath: string, options: CommandOptions): Promise<void> => {
+  private execute = async (inputPath: string, options: UseOptions): Promise<void> => {
     try {
       Logger.info('Starting code merge...')
 

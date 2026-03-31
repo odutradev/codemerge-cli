@@ -1,10 +1,10 @@
 import { Command } from 'commander'
 
-import { Logger } from '../utils/logger.js'
-import { Path } from '../utils/path.js'
-import { File } from '../utils/file.js'
+import { Logger } from '../../utils/logger.js'
+import { Path } from '../../utils/path.js'
+import { File } from '../../utils/file.js'
 
-type PackageInfo = { name: string; version: string }
+import type { PackageInfo } from './types.js'
 
 export class HelpCommand {
   public register = (program: Command): void => {
