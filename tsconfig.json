@@ -5,6 +5,13 @@
     "moduleResolution": "nodenext",
     "outDir": "./dist",
     "rootDir": "lib",
+    "baseUrl": ".",
+    "paths": {
+      "@utils/*": ["lib/utils/*"],
+      "@type/*": ["lib/types/*"],
+      "@commands/*": ["lib/commands/*"],
+      "@core/*": ["lib/core/*"]
+    },
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,

@@ -2,9 +2,9 @@ import { promisify } from 'util'
 import { resolve } from 'path'
 import { exec } from 'child_process'
 
-import { Logger } from '../../../utils/logger.js'
+import { Logger } from '@utils/logger.js'
 
-import type { ExecuteCommandsRequest, ExecuteCommandsResult } from '../../../types/merge.js'
+import type { ExecuteCommandsRequest, ExecuteCommandsResult } from '@type/merge.js'
 import type { RequestContext } from '../types.js'
 
 const execAsync = promisify(exec)

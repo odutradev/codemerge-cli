@@ -1,13 +1,13 @@
 import { basename, resolve } from 'path'
 import { Command } from 'commander'
 
-import { HttpServer } from '../../core/httpServer/index.js'
-import { FileWatcher } from '../../core/fileWatcher.js'
-import { CodeMerger } from '../../core/codeMerger.js'
-import { MergeCache } from '../../core/mergeCache.js'
-import { Process } from '../../utils/process.js'
-import { Logger } from '../../utils/logger.js'
-import { Config } from '../../core/config.js'
+import { HttpServer } from '@core/httpServer/index.js'
+import { FileWatcher } from '@core/fileWatcher.js'
+import { CodeMerger } from '@core/codeMerger.js'
+import { MergeCache } from '@core/mergeCache.js'
+import { Process } from '@utils/process.js'
+import { Logger } from '@utils/logger.js'
+import { Config } from '@core/config.js'
 
 import type { WatchOptions } from './types.js'
 

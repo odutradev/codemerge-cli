@@ -1,8 +1,8 @@
 import { exec } from 'child_process'
 
-import { Logger } from '../../../utils/logger.js'
+import { Logger } from '@utils/logger.js'
 
-import type { CommandOutput } from '../../../types/merge.js'
+import type { CommandOutput } from '@type/merge.js'
 
 export class CommandService {
   private waiters: Array<(result: CommandOutput | { status: string }) => void> = []

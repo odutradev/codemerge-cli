@@ -1,10 +1,10 @@
 import { resolve } from 'path'
 import chokidar from 'chokidar'
 
-import { Pattern } from '../utils/pattern.js'
-import { Logger } from '../utils/logger.js'
+import { Pattern } from '@utils/pattern.js'
+import { Logger } from '@utils/logger.js'
 
-import type { MergeOptions } from '../types/merge.js'
+import type { MergeOptions } from '@type/merge.js'
 
 export class FileWatcher {
   private watcher: chokidar.FSWatcher | null = null

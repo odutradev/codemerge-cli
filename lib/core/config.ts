@@ -1,11 +1,11 @@
 import { join } from 'path'
 
 import { DEFAULT_CONFIG, DEFAULT_IGNORE_PATTERNS, DEFAULT_INCLUDE_PATTERNS } from './defaults.js'
-import { Path } from '../utils/path.js'
-import { File } from '../utils/file.js'
+import { Path } from '@utils/path.js'
+import { File } from '@utils/file.js'
 
-import type { ConfigFile } from '../types/config.js'
-import type { MergeOptions } from '../types/merge.js'
+import type { ConfigFile } from '@type/config.js'
+import type { MergeOptions } from '@type/merge.js'
 
 export class Config {
   private static readonly CONFIG_FILENAMES = ['codemerge.json', 'codemerge.config.json']

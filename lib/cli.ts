@@ -1,11 +1,10 @@
 #!/usr/bin/env node
-
 import { fileURLToPath, pathToFileURL } from 'url'
 import { readFileSync, readdirSync } from 'fs'
 import { dirname, join } from 'path'
 import { Command } from 'commander'
 
-import { Logger } from './utils/logger.js'
+import { Logger } from '@utils/logger.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)

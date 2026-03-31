@@ -1,3 +1,3 @@
-import type { CommandOptions } from '../../types/config.js'
+import type { CommandOptions } from '@type/config.js'
 
 export interface UseOptions extends CommandOptions {}

@@ -1,10 +1,10 @@
 import { IncomingMessage, ServerResponse } from 'http'
 
 import { CommandService } from './services/command.js'
-import { CodeMerger } from '../codeMerger.js'
-import { MergeCache } from '../mergeCache.js'
+import { CodeMerger } from '@core/codeMerger.js'
+import { MergeCache } from '@core/mergeCache.js'
 
-import type { MergeOptions } from '../../types/merge.js'
+import type { MergeOptions } from '@type/merge.js'
 
 export interface RequestContext {
   req: IncomingMessage

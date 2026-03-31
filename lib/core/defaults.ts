@@ -1,4 +1,4 @@
-import type { ConfigFile } from '../types/config.js'
+import type { ConfigFile } from '@type/config.js'
 
 export const DEFAULT_IGNORE_PATTERNS = [
   'node_modules',
