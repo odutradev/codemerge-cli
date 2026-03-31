@@ -1,4 +1,3 @@
-import figlet from 'figlet';
 import chalk from 'chalk';
 
 export class Logger {
@@ -29,7 +28,7 @@ export class Logger {
     console.log(message);
   }
 
-  public static figlet(text: string): void {
-    console.log(chalk.cyan(figlet.textSync(text)));
+  public static banner(text: string): void {
+    console.log(chalk.cyan.bold(`\n--- ${text} ---\n`));
   }
 }

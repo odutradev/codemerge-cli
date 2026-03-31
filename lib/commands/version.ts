@@ -1,8 +1,10 @@
 import { Command } from 'commander';
 
-import { FileUtils } from '../utils/fileUtils.js';
 import { PathUtils } from '../utils/pathUtils.js';
+import { FileUtils } from '../utils/fileUtils.js';
 import { Logger } from '../utils/logger.js';
+
+type PackageInfo = { name: string; version: string };
 
 export class VersionCommand {
   public register(program: Command): void {
@@ -22,7 +24,7 @@ export class VersionCommand {
   private displayBanner(): void {
     const packageJson = this.getPackageJson();
     const name = packageJson.name.replace('-', ' ').toUpperCase();
-    Logger.figlet(name);
+    Logger.banner(name);
   }
 
   private displayVersion(): void {
@@ -30,8 +32,8 @@ export class VersionCommand {
     Logger.info(`Version: ${packageJson.version}`);
   }
 
-  private getPackageJson(): any {
+  private getPackageJson(): PackageInfo {
     const packagePath = PathUtils.getPackagePath(import.meta.url, 'package.json');
-    return FileUtils.readJson(packagePath);
+    return FileUtils.readJson<PackageInfo>(packagePath);
   }
 }

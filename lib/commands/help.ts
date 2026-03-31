@@ -1,10 +1,10 @@
 import { Command } from 'commander';
 
-import { FileUtils } from '../utils/fileUtils.js';
 import { PathUtils } from '../utils/pathUtils.js';
+import { FileUtils } from '../utils/fileUtils.js';
 import { Logger } from '../utils/logger.js';
 
-import type { CommandOptions } from '../types/config.js';
+type PackageInfo = { name: string; version: string };
 
 export class HelpCommand {
   public register(program: Command): void {
@@ -24,7 +24,7 @@ export class HelpCommand {
   private displayBanner(): void {
     const packageJson = this.getPackageJson();
     const name = packageJson.name.replace('-', ' ').toUpperCase();
-    Logger.figlet(name);
+    Logger.banner(name);
   }
 
   private displayHelp(program: Command, command?: string): void {
@@ -45,8 +45,8 @@ export class HelpCommand {
     program.help();
   }
 
-  private getPackageJson(): any {
+  private getPackageJson(): PackageInfo {
     const packagePath = PathUtils.getPackagePath(import.meta.url, 'package.json');
-    return FileUtils.readJson(packagePath);
+    return FileUtils.readJson<PackageInfo>(packagePath);
   }
 }
