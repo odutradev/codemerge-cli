@@ -1,6 +1,6 @@
+import { Command } from 'commander';
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { Command } from 'commander';
 
 import { PathUtils } from '../utils/pathUtils.js';
 import { FileUtils } from '../utils/fileUtils.js';
@@ -14,7 +14,12 @@ interface InitOptions {
 
 export class InitCommand {
   public register = (program: Command): void => {
-    program.command('init').description('Initialize CodeMerge project structure').argument('[path]', 'Target directory', '.').option('-f, --force', 'Overwrite existing files').action(this.execute);
+    program
+      .command('init')
+      .description('Initialize CodeMerge project structure')
+      .argument('[path]', 'Target directory', '.')
+      .option('-f, --force', 'Overwrite existing files')
+      .action(this.execute);
   };
 
   private execute = async (targetPath: string, options: InitOptions): Promise<void> => {
@@ -22,14 +27,18 @@ export class InitCommand {
       Logger.info('Initializing CodeMerge project...');
       const resolvedPath = PathUtils.resolve(targetPath);
       const configPath = join(resolvedPath, 'codemerge.json');
+
       if (!options.force && FileUtils.exists(configPath)) {
         Logger.error('codemerge.json already exists. Use --force to overwrite.');
         process.exit(1);
       }
+
       const projectName = this.getProjectName(resolvedPath);
       const outputPath = projectName ? `${projectName}-merged.txt` : 'merged-output.txt';
+
       this.createConfigFile(configPath, outputPath, projectName);
       this.updateGitignore(resolvedPath, outputPath);
+
       Logger.success('Configuration file created: codemerge.json');
       Logger.plain('Output file added to .gitignore: ' + outputPath);
       Logger.plain('');
@@ -45,6 +54,7 @@ export class InitCommand {
   private getProjectName = (basePath: string): string | null => {
     const packagePath = join(basePath, 'package.json');
     if (!FileUtils.exists(packagePath)) return null;
+    
     try {
       const pkg = FileUtils.readJson<{ name?: string }>(packagePath);
       if (!pkg.name) return null;
@@ -64,42 +74,73 @@ export class InitCommand {
       onStartCommandLogs: false,
       onUpsertCommand: '',
       ignorePatterns: [
-        "node_modules/**",
-        ".git/**",
-        "dist/**",
-        "build/**",
-        "**/*.log",
-        ".env*",
-        "**/.DS_Store",
-        "coverage/**",
-        ".next/**",
-        ".nuxt/**"
+        'node_modules/**',
+        '.git/**',
+        'dist/**',
+        'build/**',
+        'coverage/**',
+        '.next/**',
+        '.nuxt/**',
+        '.svelte-kit/**',
+        '.astro/**',
+        '**/.DS_Store',
+        '**/*.log',
+        '.env*'
       ],
       includePatterns: [
-        "Dockerfile",
-        "LICENSE",
-        "**/*.ts",
-        "**/*.py",
-        "**/*.js",
-        "**/*.tsx",
-        "**/*.jsx",
-        "**/*.json",
-        "**/*.html",
-        "**/*.md",
+        'Dockerfile',
+        'docker-compose*.yml',
+        'Makefile',
+        'LICENSE',
+        '**/*.ts',
+        '**/*.tsx',
+        '**/*.js',
+        '**/*.jsx',
+        '**/*.vue',
+        '**/*.svelte',
+        '**/*.astro',
+        '**/*.html',
+        '**/*.css',
+        '**/*.scss',
+        '**/*.py',
+        '**/*.go',
+        '**/*.rs',
+        '**/*.java',
+        '**/*.cpp',
+        '**/*.c',
+        '**/*.cs',
+        '**/*.php',
+        '**/*.rb',
+        '**/*.swift',
+        '**/*.kt',
+        '**/*.dart',
+        '**/*.sql',
+        '**/*.sh',
+        '**/*.md',
+        '**/*.mdx',
+        '**/*.json',
+        '**/*.yaml',
+        '**/*.yml',
+        '**/*.toml'
       ],
     };
+    
     FileUtils.write(configPath, JSON.stringify(config, null, 2) + '\n');
   };
 
   private updateGitignore = (basePath: string, outputFileName: string): void => {
     const gitignorePath = join(basePath, '.gitignore');
+    
     if (!FileUtils.exists(gitignorePath)) {
       FileUtils.write(gitignorePath, outputFileName + '\n');
       return;
     }
+    
     const content = readFileSync(gitignorePath, 'utf-8');
     const lines = content.split('\n');
+    
     if (lines.some(line => line.trim() === outputFileName)) return;
+    
     const newContent = content.endsWith('\n') ? content + outputFileName + '\n' : content + '\n' + outputFileName + '\n';
     FileUtils.write(gitignorePath, newContent);
   };
