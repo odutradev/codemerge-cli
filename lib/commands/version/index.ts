@@ -13,18 +13,11 @@ export default class VersionCommand {
 
   private execute = async (): Promise<void> => {
     try {
-      this.displayBanner()
       this.displayVersion()
     } catch (error) {
       Logger.error(error instanceof Error ? error.message : 'Unexpected error occurred')
       process.exit(1)
     }
-  }
-
-  private displayBanner = (): void => {
-    const packageJson = this.getPackageJson()
-    const name = packageJson.name.replace('-', ' ').toUpperCase()
-    Logger.banner(name)
   }
 
   private displayVersion = (): void => Logger.info(`Version: ${this.getPackageJson().version}`)

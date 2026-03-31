@@ -15,7 +15,7 @@ export default class Path {
   public static getPackageRoot = (importMetaUrl: string): string => {
     const __filename = fileURLToPath(importMetaUrl)
     const __dirname = dirname(__filename)
-    return resolve(__dirname, '../..')
+    return resolve(__dirname, '../../..')
   }
 
   public static getPackagePath = (importMetaUrl: string, ...paths: string[]): string => join(this.getPackageRoot(importMetaUrl), ...paths)

@@ -17,18 +17,11 @@ export default class HelpCommand {
 
   private execute = async (program: Command, command?: string): Promise<void> => {
     try {
-      this.displayBanner()
       this.displayHelp(program, command)
     } catch (error) {
       Logger.error(error instanceof Error ? error.message : 'Unexpected error occurred')
       process.exit(1)
     }
-  }
-
-  private displayBanner = (): void => {
-    const packageJson = this.getPackageJson()
-    const name = packageJson.name.replace('-', ' ').toUpperCase()
-    Logger.banner(name)
   }
 
   private displayHelp = (program: Command, command?: string): void => {
