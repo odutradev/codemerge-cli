@@ -4,10 +4,10 @@ import { exec } from 'child_process'
 import { promisify } from 'util'
 
 import { translateText } from '../utils/translate.js'
-import { FileUtils } from '../utils/fileUtils.js'
 import { CodeMerger } from './codeMerger.js'
 import { MergeCache } from './mergeCache.js'
 import { Logger } from '../utils/logger.js'
+import { File } from '../utils/file.js'
 
 import type { UpsertRequest, UpsertResult, SelectiveContentRequest, MergeOptions, CommandOutput, DeleteFilesRequest, DeleteFilesResult, CommitRequest, ExecuteCommandsRequest, ExecuteCommandsResult } from '../types/merge.js'
 
@@ -286,7 +286,7 @@ export class HttpServer {
       if (!fullPath.startsWith(basePath)) return { path: file.path, action: 'created', success: false, error: 'Path outside base directory' }
 
       try {
-        const action = FileUtils.upsert(fullPath, file.content)
+        const action = File.upsert(fullPath, file.content)
         return { path: file.path, action, success: true }
       } catch (error) {
         return { path: file.path, action: 'created', success: false, error: error instanceof Error ? error.message : 'Unknown error' }
@@ -310,12 +310,8 @@ export class HttpServer {
       if (!fullPath.startsWith(basePath)) return { path: file, success: false, error: 'Path outside base directory' }
 
       try {
-        const success = FileUtils.deleteFile(fullPath)
-        
-        if (success) {
-          FileUtils.deleteEmptyDirs(dirname(fullPath), basePath)
-        }
-
+        const success = File.deleteFile(fullPath)
+        if (success) File.deleteEmptyDirs(dirname(fullPath), basePath)
         return { path: file, success, error: success ? undefined : 'File not found' }
       } catch (error) {
         return { path: file, success: false, error: error instanceof Error ? error.message : 'Unknown error' }

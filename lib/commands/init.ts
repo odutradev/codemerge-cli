@@ -1,11 +1,11 @@
-import { Command } from 'commander'
 import { readFileSync } from 'fs'
+import { Command } from 'commander'
 import { join } from 'path'
 
 import { DEFAULT_CONFIG } from '../core/defaults.js'
-import { PathUtils } from '../utils/pathUtils.js'
-import { FileUtils } from '../utils/fileUtils.js'
 import { Logger } from '../utils/logger.js'
+import { Path } from '../utils/path.js'
+import { File } from '../utils/file.js'
 
 import type { ConfigFile } from '../types/config.js'
 
@@ -26,10 +26,10 @@ export class InitCommand {
   private execute = async (targetPath: string, options: InitOptions): Promise<void> => {
     try {
       Logger.info('Initializing CodeMerge project...')
-      const resolvedPath = PathUtils.resolve(targetPath)
+      const resolvedPath = Path.resolve(targetPath)
       const configPath = join(resolvedPath, 'codemerge.json')
 
-      if (!options.force && FileUtils.exists(configPath)) {
+      if (!options.force && File.exists(configPath)) {
         Logger.error('codemerge.json already exists. Use --force to overwrite.')
         process.exit(1)
       }
@@ -41,11 +41,8 @@ export class InitCommand {
       this.updateGitignore(resolvedPath, outputPath)
 
       Logger.success('Configuration file created: codemerge.json')
-      Logger.plain('Output file added to .gitignore: ' + outputPath)
-      Logger.plain('')
-      Logger.plain('Next steps:')
-      Logger.plain('  1. Review codemerge.json settings')
-      Logger.plain('  2. Run: codemerge use')
+      Logger.plain(`Output file added to .gitignore: ${outputPath}`)
+      Logger.plain('\nNext steps:\n  1. Review codemerge.json settings\n  2. Run: codemerge use')
     } catch (error) {
       Logger.error(error instanceof Error ? error.message : 'Unexpected error occurred')
       process.exit(1)
@@ -54,10 +51,10 @@ export class InitCommand {
 
   private getProjectName = (basePath: string): string | null => {
     const packagePath = join(basePath, 'package.json')
-    if (!FileUtils.exists(packagePath)) return null
+    if (!File.exists(packagePath)) return null
     
     try {
-      const pkg = FileUtils.readJson<{ name?: string }>(packagePath)
+      const pkg = File.readJson<{ name?: string }>(packagePath)
       if (!pkg.name) return null
       return pkg.name.replace(/^@.*?\//, '').replace(/[^a-zA-Z0-9-_]/g, '-').toLowerCase()
     } catch {
@@ -66,29 +63,21 @@ export class InitCommand {
   }
 
   private createConfigFile = (configPath: string, outputPath: string, projectName: string | null): void => {
-    const config: ConfigFile = {
-      projectName: projectName ?? 'codemerge-project',
-      outputPath,
-      ...DEFAULT_CONFIG
-    }
-    
-    FileUtils.write(configPath, JSON.stringify(config, null, 2) + '\n')
+    const config: ConfigFile = { projectName: projectName ?? 'codemerge-project', outputPath, ...DEFAULT_CONFIG }
+    File.write(configPath, JSON.stringify(config, null, 2) + '\n')
   }
 
   private updateGitignore = (basePath: string, outputFileName: string): void => {
     const gitignorePath = join(basePath, '.gitignore')
     
-    if (!FileUtils.exists(gitignorePath)) {
-      FileUtils.write(gitignorePath, outputFileName + '\n')
+    if (!File.exists(gitignorePath)) {
+      File.write(gitignorePath, outputFileName + '\n')
       return
     }
     
     const content = readFileSync(gitignorePath, 'utf-8')
-    const lines = content.split('\n')
+    if (content.split('\n').some(line => line.trim() === outputFileName)) return
     
-    if (lines.some(line => line.trim() === outputFileName)) return
-    
-    const newContent = content.endsWith('\n') ? content + outputFileName + '\n' : content + '\n' + outputFileName + '\n'
-    FileUtils.write(gitignorePath, newContent)
+    File.write(gitignorePath, content.endsWith('\n') ? `${content}${outputFileName}\n` : `${content}\n${outputFileName}\n`)
   }
 }

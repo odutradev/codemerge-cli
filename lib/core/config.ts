@@ -1,47 +1,47 @@
 import { join } from 'path'
 
 import { DEFAULT_CONFIG, DEFAULT_IGNORE_PATTERNS, DEFAULT_INCLUDE_PATTERNS } from './defaults.js'
-import { PathUtils } from '../utils/pathUtils.js'
-import { FileUtils } from '../utils/fileUtils.js'
+import { Path } from '../utils/path.js'
+import { File } from '../utils/file.js'
 
-import type { MergeOptions } from '../types/merge.js'
 import type { ConfigFile } from '../types/config.js'
+import type { MergeOptions } from '../types/merge.js'
 
 export class Config {
   private static readonly CONFIG_FILENAMES = ['codemerge.json', 'codemerge.config.json']
 
-  public static load(basePath: string): ConfigFile {
-    const resolvedPath = PathUtils.resolve(basePath)
+  public static load = (basePath: string): ConfigFile => {
+    const resolvedPath = Path.resolve(basePath)
 
     for (const filename of this.CONFIG_FILENAMES) {
       const configPath = join(resolvedPath, filename)
-      if (FileUtils.exists(configPath)) return this.parseConfigFile(configPath)
+      if (File.exists(configPath)) return this.parseConfigFile(configPath)
     }
 
     return this.loadPackageJsonConfig(resolvedPath)
   }
 
-  private static parseConfigFile(path: string): ConfigFile {
+  private static parseConfigFile = (path: string): ConfigFile => {
     try {
-      return FileUtils.readJson<ConfigFile>(path)
+      return File.readJson<ConfigFile>(path)
     } catch {
       return {}
     }
   }
 
-  private static loadPackageJsonConfig(basePath: string): ConfigFile {
+  private static loadPackageJsonConfig = (basePath: string): ConfigFile => {
     const packagePath = join(basePath, 'package.json')
-    if (!FileUtils.exists(packagePath)) return {}
+    if (!File.exists(packagePath)) return {}
 
     try {
-      const pkg = FileUtils.readJson<{ codemergeConfig?: ConfigFile }>(packagePath)
+      const pkg = File.readJson<{ codemergeConfig?: ConfigFile }>(packagePath)
       return pkg.codemergeConfig ?? {}
     } catch {
       return {}
     }
   }
 
-  public static merge(config: ConfigFile, options: Partial<MergeOptions>): MergeOptions {
+  public static merge = (config: ConfigFile, options: Partial<MergeOptions>): MergeOptions => {
     const outputPath = options.outputPath || config.outputPath || 'merged-output.txt'
     const ignorePatterns = this.mergeIgnorePatterns(config.ignorePatterns, options.ignorePatterns, outputPath)
 
@@ -62,7 +62,7 @@ export class Config {
     }
   }
 
-  private static mergeIgnorePatterns(configPatterns?: string[], optionPatterns?: string[], outputPath?: string): string[] {
+  private static mergeIgnorePatterns = (configPatterns?: string[], optionPatterns?: string[], outputPath?: string): string[] => {
     const patterns = new Set([...DEFAULT_IGNORE_PATTERNS])
 
     if (configPatterns) configPatterns.forEach(p => patterns.add(p))

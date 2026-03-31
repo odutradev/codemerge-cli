@@ -1,52 +1,53 @@
-import { Command } from 'commander';
+import { Command } from 'commander'
 
-import { PathUtils } from '../utils/pathUtils.js';
-import { FileUtils } from '../utils/fileUtils.js';
-import { Logger } from '../utils/logger.js';
+import { Logger } from '../utils/logger.js'
+import { Path } from '../utils/path.js'
+import { File } from '../utils/file.js'
 
-type PackageInfo = { name: string; version: string };
+type PackageInfo = { name: string; version: string }
 
 export class HelpCommand {
-  public register(program: Command): void {
-    program.command('help').description('Display help information').argument('[command]', 'Command to get help for').action((command?: string) => this.execute(program, command));
+  public register = (program: Command): void => {
+    program
+      .command('help')
+      .description('Display help information')
+      .argument('[command]', 'Command to get help for')
+      .action((command?: string) => this.execute(program, command))
   }
 
-  private async execute(program: Command, command?: string): Promise<void> {
+  private execute = async (program: Command, command?: string): Promise<void> => {
     try {
-      this.displayBanner();
-      this.displayHelp(program, command);
+      this.displayBanner()
+      this.displayHelp(program, command)
     } catch (error) {
-      Logger.error(error instanceof Error ? error.message : 'Unexpected error occurred');
-      process.exit(1);
+      Logger.error(error instanceof Error ? error.message : 'Unexpected error occurred')
+      process.exit(1)
     }
   }
 
-  private displayBanner(): void {
-    const packageJson = this.getPackageJson();
-    const name = packageJson.name.replace('-', ' ').toUpperCase();
-    Logger.banner(name);
+  private displayBanner = (): void => {
+    const packageJson = this.getPackageJson()
+    const name = packageJson.name.replace('-', ' ').toUpperCase()
+    Logger.banner(name)
   }
 
-  private displayHelp(program: Command, command?: string): void {
+  private displayHelp = (program: Command, command?: string): void => {
     if (command) {
-      this.displayCommandHelp(program, command);
-      return;
+      this.displayCommandHelp(program, command)
+      return
     }
-    program.help();
+    program.help()
   }
 
-  private displayCommandHelp(program: Command, commandName: string): void {
-    const cmd = program.commands.find(c => c.name() === commandName);
+  private displayCommandHelp = (program: Command, commandName: string): void => {
+    const cmd = program.commands.find(c => c.name() === commandName)
     if (cmd) {
-      cmd.help();
-      return;
+      cmd.help()
+      return
     }
-    Logger.error(`Command '${commandName}' not found`);
-    program.help();
+    Logger.error(`Command '${commandName}' not found`)
+    program.help()
   }
 
-  private getPackageJson(): PackageInfo {
-    const packagePath = PathUtils.getPackagePath(import.meta.url, 'package.json');
-    return FileUtils.readJson<PackageInfo>(packagePath);
-  }
+  private getPackageJson = (): PackageInfo => File.readJson<PackageInfo>(Path.getPackagePath(import.meta.url, 'package.json'))
 }

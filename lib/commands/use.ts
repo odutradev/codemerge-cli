@@ -1,66 +1,70 @@
-import { Command } from 'commander';
+import { Command } from 'commander'
 
-import { ProcessUtils } from '../utils/processUtils.js';
-import { CodeMerger } from '../core/codeMerger.js';
-import { Config } from '../core/config.js';
-import { FileWatcher } from '../core/fileWatcher.js';
-import { Logger } from '../utils/logger.js';
+import { FileWatcher } from '../core/fileWatcher.js'
+import { CodeMerger } from '../core/codeMerger.js'
+import { Process } from '../utils/process.js'
+import { Logger } from '../utils/logger.js'
+import { Config } from '../core/config.js'
 
-import type { CommandOptions } from '../types/config.js';
+import type { CommandOptions } from '../types/config.js'
 
 export class UseCommand {
-  public register(program: Command): void {
-    program.command('use').description('Merge code files into a single output file').argument('[path]', 'Input path to scan', '.').option('-o, --output <path>', 'Output file path').option('-w, --watch', 'Watch for file changes').option('--ignore <patterns>', 'Additional ignore patterns (comma-separated)').option('--include <patterns>', 'Include patterns (comma-separated)').action(this.execute.bind(this));
+  public register = (program: Command): void => {
+    program
+      .command('use')
+      .description('Merge code files into a single output file')
+      .argument('[path]', 'Input path to scan', '.')
+      .option('-o, --output <path>', 'Output file path')
+      .option('-w, --watch', 'Watch for file changes')
+      .option('--ignore <patterns>', 'Additional ignore patterns (comma-separated)')
+      .option('--include <patterns>', 'Include patterns (comma-separated)')
+      .action(this.execute)
   }
 
-  private async execute(inputPath: string, options: CommandOptions): Promise<void> {
+  private execute = async (inputPath: string, options: CommandOptions): Promise<void> => {
     try {
-      Logger.info('Starting code merge...');
+      Logger.info('Starting code merge...')
 
-      const config = Config.load(inputPath);
+      const config = Config.load(inputPath)
       const mergeOptions = Config.merge(config, {
         inputPath,
         outputPath: options.output,
         watch: options.watch,
         ignorePatterns: options.ignore ? options.ignore.split(',') : undefined,
         includePatterns: options.include ? options.include.split(',') : undefined
-      });
+      })
 
-      if (mergeOptions.onStartCommand) {
-        ProcessUtils.runCommand(mergeOptions.onStartCommand, mergeOptions.onStartCommandLogs);
-      }
+      if (mergeOptions.onStartCommand) Process.runCommand(mergeOptions.onStartCommand, mergeOptions.onStartCommandLogs)
 
-      const merger = new CodeMerger(mergeOptions);
-      const result = await merger.execute();
+      const merger = new CodeMerger(mergeOptions)
+      const result = await merger.execute()
 
       if (!result.success) {
-        Logger.error('Merge failed:');
-        result.errors.forEach(error => Logger.error('  ' + error));
-        process.exit(1);
+        Logger.error('Merge failed:')
+        result.errors.forEach(error => Logger.error(`  ${error}`))
+        process.exit(1)
       }
 
-      Logger.success('Merged ' + result.filesProcessed + ' files into ' + result.outputPath);
+      Logger.success(`Merged ${result.filesProcessed} files into ${result.outputPath}`)
 
       if (mergeOptions.watch) {
         const watcher = new FileWatcher(mergeOptions, async () => {
-          const result = await merger.execute();
-          if (result.success) {
-            Logger.success('Merged ' + result.filesProcessed + ' files into ' + result.outputPath);
-          }
-        });
-        watcher.start();
+          const res = await merger.execute()
+          if (res.success) Logger.success(`Merged ${res.filesProcessed} files into ${res.outputPath}`)
+        })
+        watcher.start()
 
         process.on('SIGINT', () => {
-          Logger.plain('\nStopping watcher...');
-          watcher.stop();
-          process.exit(0);
-        });
+          Logger.plain('\nStopping watcher...')
+          watcher.stop()
+          process.exit(0)
+        })
 
-        Logger.plain('Press Ctrl+C to stop watching');
+        Logger.plain('Press Ctrl+C to stop watching')
       }
     } catch (error) {
-      Logger.error(error instanceof Error ? error.message : 'Unexpected error occurred');
-      process.exit(1);
+      Logger.error(error instanceof Error ? error.message : 'Unexpected error occurred')
+      process.exit(1)
     }
   }
 }

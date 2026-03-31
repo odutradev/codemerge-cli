@@ -1,8 +1,8 @@
 import { resolve, relative, basename, join } from 'path'
 import { promises } from 'fs'
 
-import { PatternUtils } from '../utils/pattern.js'
-import { FileUtils } from '../utils/fileUtils.js'
+import { Pattern } from '../utils/pattern.js'
+import { File } from '../utils/file.js'
 
 import type { ProjectStructure, ProjectNode, MergeOptions, MergeResult, FileData } from '../types/merge.js'
 
@@ -71,7 +71,7 @@ export class CodeMerger {
         selectedPaths.some(selected => {
           const normalizedSelected = selected.replace(/\\/g, '/')
           const normalizedFile = file.relativePath.replace(/\\/g, '/')
-          return normalizedFile === normalizedSelected || normalizedFile.startsWith(normalizedSelected + '/')
+          return normalizedFile === normalizedSelected || normalizedFile.startsWith(`${normalizedSelected}/`)
         })
       )
 
@@ -156,8 +156,8 @@ export class CodeMerger {
     const ignorePatterns = this.getIgnorePatterns(inputPath)
     const includePatterns = this.options.includePatterns
 
-    const ignoreRegexes = ignorePatterns.map(p => PatternUtils.globToRegex(p))
-    const includeRegexes = includePatterns.map(p => PatternUtils.globToRegex(p))
+    const ignoreRegexes = ignorePatterns.map(p => Pattern.globToRegex(p))
+    const includeRegexes = includePatterns.map(p => Pattern.globToRegex(p))
 
     const walk = async (currentPath: string, relativeDir: string): Promise<void> => {
       try {
@@ -174,10 +174,10 @@ export class CodeMerger {
           } else if (entry.isFile()) {
             if (!includeRegexes.some(r => r.test(relPath))) continue
 
-            if (this.shouldProcessFile(fullPath, inputPath) && FileUtils.isTextFile(fullPath)) {
+            if (this.shouldProcessFile(fullPath, inputPath) && File.isTextFile(fullPath)) {
               files.push({
                 path: fullPath,
-                content: FileUtils.read(fullPath),
+                content: File.read(fullPath),
                 relativePath: relPath
               })
             }
@@ -193,7 +193,7 @@ export class CodeMerger {
   }
 
   private shouldProcessFile = (fullPath: string, inputPath: string): boolean => {
-    if (!FileUtils.exists(fullPath)) return false
+    if (!File.exists(fullPath)) return false
 
     const relativePath = relative(inputPath, fullPath)
     const outputFileName = basename(this.options.outputPath)
@@ -240,11 +240,11 @@ export class CodeMerger {
     const mergedContent = files.map(file => {
       const fileSeparator = '-'.repeat(40)
       return [
-        'STARTOFFILE: ' + file.relativePath,
+        `STARTOFFILE: ${file.relativePath}`,
         fileSeparator,
         file.content,
         fileSeparator,
-        'ENDOFFILE: ' + file.relativePath,
+        `ENDOFFILE: ${file.relativePath}`,
         ''
       ].join('\n')
     }).join('\n')
@@ -256,11 +256,11 @@ export class CodeMerger {
     const timestamp = new Date().toISOString()
     return [
       '# Code Merge Output',
-      'Generated at: ' + timestamp,
-      'Source path: ' + this.options.inputPath,
-      'Files processed: ' + fileCount,
-      'Total lines: ' + totalLines,
-      'Total characters: ' + totalChars,
+      `Generated at: ${timestamp}`,
+      `Source path: ${this.options.inputPath}`,
+      `Files processed: ${fileCount}`,
+      `Total lines: ${totalLines}`,
+      `Total characters: ${totalChars}`,
       '',
       breakdown,
       '',
@@ -331,7 +331,5 @@ export class CodeMerger {
     return lines.join('\n')
   }
 
-  private writeOutput = (content: string): void => {
-    FileUtils.write(this.options.outputPath, content)
-  }
+  private writeOutput = (content: string): void => File.write(this.options.outputPath, content)
 }
