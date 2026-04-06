@@ -58,6 +58,7 @@ export const DEFAULT_INCLUDE_PATTERNS = [
   '**/*.svelte',
   '**/*.astro',
   '**/*.html',
+  '**/*.gs',
   '**/*.css',
   '**/*.scss',
   '**/*.py',
